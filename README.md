@@ -2,6 +2,31 @@
 
 Curated Codex skills focused on productivity workflows, intended for sharing and installation via skills tooling.
 
+## How To Add (Skills CLI)
+
+```bash
+npx @vercel/skills add gaelic-ghost/productivity-skills
+```
+
+```bash
+npx skills add gaelic-ghost/productivity-skills
+```
+
+CLI flags from the [`skills` package docs](https://www.npmjs.com/package/skills):
+
+- `-a, --agent <agents...>`: target specific agents (recommended here: `-a codex`)
+- `-g, --global`: install globally instead of project-local
+
+Examples:
+
+```bash
+# Project-local install for Codex
+npx skills add gaelic-ghost/productivity-skills -a codex
+
+# Global install for Codex
+npx skills add gaelic-ghost/productivity-skills -a codex -g
+```
+
 ## Included skills
 
 - `project-roadmap-manager`
