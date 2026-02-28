@@ -130,7 +130,13 @@ wait_for_model_ready() {
 
   while (( waited <= MAX_WAIT_SECONDS )); do
     local status_json
-    status_json="$(curl -sS "$BASE_URL/model/status" || true)"
+    status_json="$(curl -sS "$BASE_URL/model/status" 2>/dev/null || true)"
+    if [[ -z "$status_json" ]]; then
+      echo "Model status endpoint unavailable; retrying..." >&2
+      sleep "$interval"
+      waited=$((waited + interval))
+      continue
+    fi
 
     local loaded loading ready detail
     loaded="$(json_field "$status_json" "loaded")"
@@ -142,6 +148,12 @@ wait_for_model_ready() {
     fi
 
     if [[ "$ready" != "True" && "$ready" != "true" ]]; then
+      if [[ -z "$ready" ]]; then
+        echo "Model status response not ready for parsing; retrying..." >&2
+        sleep "$interval"
+        waited=$((waited + interval))
+        continue
+      fi
       echo "Model runtime is not ready: $detail" >&2
       return 1
     fi
@@ -161,13 +173,48 @@ wait_for_model_ready() {
   return 1
 }
 
-curl -fsS "$BASE_URL/health" >/dev/null
+wait_for_service_healthy() {
+  local waited=0
+  local interval=2
+  while (( waited <= MAX_WAIT_SECONDS )); do
+    if curl -fsS "$BASE_URL/health" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep "$interval"
+    waited=$((waited + interval))
+  done
 
-LOAD_STATUS="$(curl -sS -o /tmp/talktomepy-load-response.json -w "%{http_code}" -X POST "$BASE_URL/model/load" \
-  -H "Content-Type: application/json" \
-  -d '{"mode":"voice_design","strict_load":false}')"
-if [[ "$LOAD_STATUS" != "200" && "$LOAD_STATUS" != "202" ]]; then
+  echo "Service health endpoint unavailable after ${MAX_WAIT_SECONDS}s: $BASE_URL/health" >&2
+  return 1
+}
+
+wait_for_service_healthy
+
+LOAD_STATUS=""
+load_attempt=1
+while (( load_attempt <= MAX_SYNTH_RETRIES )); do
+  LOAD_STATUS="$(curl -sS -o /tmp/talktomepy-load-response.json -w "%{http_code}" -X POST "$BASE_URL/model/load" \
+    -H "Content-Type: application/json" \
+    -d '{"mode":"voice_design","strict_load":false}' || true)"
+
+  if [[ "$LOAD_STATUS" == "200" || "$LOAD_STATUS" == "202" ]]; then
+    break
+  fi
+
+  if [[ "$LOAD_STATUS" == "503" || "$LOAD_STATUS" == "000" || -z "$LOAD_STATUS" ]]; then
+    echo "Model load not ready (HTTP ${LOAD_STATUS:-000}). Retry $load_attempt/$MAX_SYNTH_RETRIES in ${DEFAULT_RETRY_AFTER_SECONDS}s..." >&2
+    sleep "$DEFAULT_RETRY_AFTER_SECONDS"
+    load_attempt=$((load_attempt + 1))
+    continue
+  fi
+
   echo "Model load request failed with HTTP $LOAD_STATUS" >&2
+  cat /tmp/talktomepy-load-response.json >&2 || true
+  exit 1
+done
+
+if [[ "$LOAD_STATUS" != "200" && "$LOAD_STATUS" != "202" ]]; then
+  echo "Model load failed after $MAX_SYNTH_RETRIES retries (last HTTP ${LOAD_STATUS:-000})" >&2
   cat /tmp/talktomepy-load-response.json >&2 || true
   exit 1
 fi
@@ -199,9 +246,10 @@ fi
 SYNTH_HEADERS="$(mktemp /tmp/talktomepy-tts-headers-XXXXXX.txt)"
 attempt=1
 while (( attempt <= MAX_SYNTH_RETRIES )); do
+  : >"$SYNTH_HEADERS"
   HTTP_STATUS="$(curl -sS -D "$SYNTH_HEADERS" -o "$FINAL_PATH" -w "%{http_code}" -X POST "$BASE_URL/synthesize/voice-design" \
     -H "Content-Type: application/json" \
-    -d "$JSON_PAYLOAD")"
+    -d "$JSON_PAYLOAD" || true)"
 
   if [[ "$HTTP_STATUS" == "200" ]]; then
     break
@@ -214,6 +262,13 @@ while (( attempt <= MAX_SYNTH_RETRIES )); do
     fi
     echo "Model still loading (HTTP 503). Retry $attempt/$MAX_SYNTH_RETRIES in ${RETRY_AFTER}s..." >&2
     sleep "$RETRY_AFTER"
+    attempt=$((attempt + 1))
+    continue
+  fi
+
+  if [[ "$HTTP_STATUS" == "000" || -z "$HTTP_STATUS" ]]; then
+    echo "Service temporarily unreachable (HTTP ${HTTP_STATUS:-000}). Retry $attempt/$MAX_SYNTH_RETRIES in ${DEFAULT_RETRY_AFTER_SECONDS}s..." >&2
+    sleep "$DEFAULT_RETRY_AFTER_SECONDS"
     attempt=$((attempt + 1))
     continue
   fi
