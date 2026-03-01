@@ -70,7 +70,7 @@ python3 scripts/readme_alignment_maintainer.py \
 
 Use `references/profile-model.md`:
 
-- public curated repos: enforce full schema and discoverability sections
+- public curated repos: enforce full schema including `## Update Skills` plus wrapped discoverability sections (`## More resources for similar Skills` with required nested `###` subsections)
 - private/internal repos: keep concise, omit growth-only sections
 - bootstrap repos: allow initial README creation with minimal complete structure
 

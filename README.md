@@ -29,29 +29,45 @@ This repository helps users and agents run recurring maintenance tasks with cons
 Use the Vercel `skills` CLI against this repository to install any skill directory you want to use. Or install them all conveniently with one command.
 
 ```bash
-# Install your choice of skill(s) via the Vercel `skills` CLI
+# Install your choice of skill(s) interactively via the Vercel `skills` CLI
 # Using `npx` fetches `skills` without installing it on your machine
 npx skills add gaelic-ghost/productivity-skills
 ```
 
 The CLI will prompt you to choose which skill(s) to install from this repo.
 
+```bash
+# Install all skills from this repo non-interactively
+npx skills add gaelic-ghost/productivity-skills --all
+```
+
 ## Install individually by Skill
 
 ```bash
 
-npx skills add gaelic-ghost/productivity-skills@docs-alignment-maintainer
+npx skills add gaelic-ghost/productivity-skills --skill docs-alignment-maintainer
 
-npx skills add gaelic-ghost/productivity-skills@skills-readme-alignment-maintainer
+npx skills add gaelic-ghost/productivity-skills --skill skills-readme-alignment-maintainer
 
-npx skills add gaelic-ghost/productivity-skills@project-roadmap-manager
+npx skills add gaelic-ghost/productivity-skills --skill project-roadmap-manager
 
-npx skills add gaelic-ghost/productivity-skills@workspace-cleanup-audit
+npx skills add gaelic-ghost/productivity-skills --skill workspace-cleanup-audit
 
-npx skills add gaelic-ghost/productivity-skills@things-week-ahead-digest
+npx skills add gaelic-ghost/productivity-skills --skill things-week-ahead-digest
 ```
 
-## Find Skills like these with the `skills` CLI by Vercel — [vercel-labs/skills](https://github.com/vercel-labs/skills)
+## Update Skills
+
+```bash
+# Check for available updates to installed Skills
+npx skills check
+# Update installed Skills
+npx skills update
+```
+
+## More resources for similar Skills
+
+### Find Skills like these with the `skills` CLI by Vercel — [vercel-labs/skills](https://github.com/vercel-labs/skills)
 
 ```bash
 npx skills find "workspace maintenance codex"
@@ -59,13 +75,16 @@ npx skills find "readme alignment skill"
 npx skills find "productivity automation"
 ```
 
-## Find Skills like these with `Find Skills` by Vercel — [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)
+### Find Skills like these with the `Find Skills` Skill by Vercel — [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)
 
 ```bash
-npx skills add vercel-labs/agent-skills -a codex
-npx skills find "codex automation templates"
-npx skills find "docs drift maintenance"
+# `Find Skills` is a part of Vercel's `agent-skills` repo
+npx skills add vercel-labs/agent-skills --skill find-skills
 ```
+
+Then ask your Agent for help finding a skill for "" or ""
+
+### Leaderboard
 
 - Skills catalog: [skills.sh](https://skills.sh/)
 
