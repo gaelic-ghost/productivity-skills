@@ -20,20 +20,55 @@ BOOTSTRAP_REPOS = {"a11y-skills"}
 
 EXPECTED_OWNER = "gaelic-ghost"
 
-SECTION_PATTERNS_CORE = [
-    ("what", r"^##\s+What These Agent Skills Help With\s*$"),
-    ("guide", r"^##\s+Skill Guide \(When To Use What\)\s*$"),
-    ("quickstart", r"^##\s+Quick Start \(Vercel Skills CLI\)\s*$"),
-    ("individual", r"^##\s+Install individually by Skill\s*$"),
-    ("find_cli", r"^##\s+Find Skills like these with.*skills CLI"),
-    ("layout", r"^##\s+Repository Layout\s*$"),
-    ("notes", r"^##\s+Notes\s*$"),
-    ("license", r"^##\s+License\s*$"),
-]
+CORE_SECTION_KEYS = ["what", "guide", "quickstart", "individual", "find_cli", "layout", "notes", "license"]
+PUBLIC_EXTRA_KEYS = ["find_skill", "keywords"]
 
-PUBLIC_EXTRA_PATTERNS = [
-    ("find_skill", r"^##\s+Find Skills like these with.*Find Skills"),
-    ("keywords", r"^##\s+Search Keywords\s*$"),
+SECTION_CANONICAL_HEADINGS = {
+    "what": "What These Agent Skills Help With",
+    "guide": "Skill Guide (When To Use What)",
+    "quickstart": "Quick Start (Vercel Skills CLI)",
+    "individual": "Install individually by Skill",
+    "find_cli": "Find Skills like these with the `skills` CLI by Vercel — [vercel-labs/skills](https://github.com/vercel-labs/skills)",
+    "layout": "Repository Layout",
+    "notes": "Notes",
+    "license": "License",
+    "find_skill": "Find Skills like these with `Find Skills` by Vercel — [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)",
+    "keywords": "Search Keywords",
+}
+
+SECTION_PATTERNS = {
+    "what": r"^##\s+What These Agent Skills Help With\s*$",
+    "guide": r"^##\s+Skill Guide \(When To Use What\)\s*$",
+    "quickstart": r"^##\s+Quick Start \(Vercel Skills CLI\)\s*$",
+    "individual": r"^##\s+Install individually by Skill\s*$",
+    "find_cli": r"^##\s+Find Skills like these with.*`?skills`?\s+CLI",
+    "layout": r"^##\s+Repository Layout\s*$",
+    "notes": r"^##\s+Notes\s*$",
+    "license": r"^##\s+License\s*$",
+    "find_skill": r"^##\s+Find Skills like these with.*`?Find Skills`?",
+    "keywords": r"^##\s+Search Keywords\s*$",
+}
+
+HEADING_ALIASES = {
+    "how to add (skills cli)": "quickstart",
+    "how to add (vercel skills cli)": "quickstart",
+    "how to add with skills cli": "quickstart",
+    "quickstart (skills cli)": "quickstart",
+    "included skills": "guide",
+    "included skill": "guide",
+    "skills included": "guide",
+    "install by skill": "individual",
+    "install individually by skills": "individual",
+}
+
+HIGH_CONFIDENCE_HEADING_PATTERNS = [
+    ("quickstart", re.compile(r"^quick\s*start.*skills\s*cli$", re.IGNORECASE)),
+    ("quickstart", re.compile(r"^how\s+to\s+add.*skills\s*cli$", re.IGNORECASE)),
+    ("individual", re.compile(r"^install\s+(?:individually|individual)\s+by\s+skills?$", re.IGNORECASE)),
+    ("individual", re.compile(r"^install\s+by\s+skills?$", re.IGNORECASE)),
+    ("guide", re.compile(r"^included\s+skills?$", re.IGNORECASE)),
+    ("find_cli", re.compile(r"^find\s+skills?.*skills\s*cli.*$", re.IGNORECASE)),
+    ("find_skill", re.compile(r"^find\s+skills?.*find\s+skills.*$", re.IGNORECASE)),
 ]
 
 SECTION_TEMPLATES = {
@@ -82,9 +117,12 @@ class Issue:
     recommended_fix: str
     auto_fixable: bool
     fixed: bool = False
+    normalized_from: Optional[str] = None
+    normalized_to: Optional[str] = None
+    normalization_method: Optional[str] = None
 
     def to_dict(self) -> Dict[str, object]:
-        return {
+        payload: Dict[str, object] = {
             "issue_id": self.issue_id,
             "category": self.category,
             "severity": self.severity,
@@ -94,6 +132,31 @@ class Issue:
             "recommended_fix": self.recommended_fix,
             "auto_fixable": self.auto_fixable,
             "fixed": self.fixed,
+        }
+        if self.normalized_from is not None:
+            payload["normalized_from"] = self.normalized_from
+        if self.normalized_to is not None:
+            payload["normalized_to"] = self.normalized_to
+        if self.normalization_method is not None:
+            payload["normalization_method"] = self.normalization_method
+        return payload
+
+
+@dataclass
+class HeadingNormalizationEvent:
+    line: int
+    section_key: str
+    original_heading: str
+    normalized_heading: str
+    normalization_method: str
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "line": self.line,
+            "section_key": self.section_key,
+            "original_heading": self.original_heading,
+            "normalized_heading": self.normalized_heading,
+            "normalization_method": self.normalization_method,
         }
 
 
@@ -183,6 +246,58 @@ def heading_lines(text: str) -> List[Tuple[int, str]]:
     return out
 
 
+def canonical_heading_line(section_key: str) -> str:
+    return f"## {SECTION_CANONICAL_HEADINGS[section_key]}"
+
+
+def expected_section_keys(profile: str) -> List[str]:
+    keys = list(CORE_SECTION_KEYS)
+    if profile == "public-curated":
+        keys.extend(PUBLIC_EXTRA_KEYS)
+    return keys
+
+
+def heading_body(line: str) -> str:
+    return line[3:].strip() if line.startswith("## ") else line.strip()
+
+
+def normalize_heading_lookup_key(value: str) -> str:
+    key = re.sub(r"\s+", " ", value.strip().lower())
+    key = key.replace("`", "")
+    return key
+
+
+def resolve_section_key_for_heading(line: str, allowed_keys: Sequence[str]) -> Tuple[Optional[str], Optional[str]]:
+    body = heading_body(line)
+    normalized_body = normalize_heading_lookup_key(body)
+    allowed = set(allowed_keys)
+
+    # Alias mappings are deterministic and preferred over pattern guesses.
+    alias_key = HEADING_ALIASES.get(normalized_body)
+    if alias_key and alias_key in allowed:
+        return alias_key, "alias"
+
+    matched_keys: List[str] = []
+    for key, rx in HIGH_CONFIDENCE_HEADING_PATTERNS:
+        if key in allowed and rx.search(normalized_body):
+            matched_keys.append(key)
+    if len(set(matched_keys)) == 1:
+        return matched_keys[0], "pattern"
+    if len(set(matched_keys)) > 1:
+        return None, None
+
+    return None, None
+
+
+def find_matching_heading_indices(headings: List[Tuple[int, str]], pattern: str) -> List[int]:
+    rx = re.compile(pattern, re.IGNORECASE)
+    matches: List[int] = []
+    for idx, (_lineno, heading) in enumerate(headings):
+        if rx.search(heading):
+            matches.append(idx)
+    return matches
+
+
 def first_match_heading_index(headings: List[Tuple[int, str]], pattern: str) -> Optional[int]:
     rx = re.compile(pattern, re.IGNORECASE)
     for idx, (_lineno, heading) in enumerate(headings):
@@ -238,9 +353,7 @@ def check_sections(repo: Path, profile: str, text: str) -> List[Issue]:
 
     headings = heading_lines(text)
 
-    patterns = list(SECTION_PATTERNS_CORE)
-    if profile == "public-curated":
-        patterns.extend(PUBLIC_EXTRA_PATTERNS)
+    patterns = [(key, SECTION_PATTERNS[key]) for key in expected_section_keys(profile)]
 
     matched: List[Tuple[str, int]] = []
     for key, pattern in patterns:
@@ -260,6 +373,45 @@ def check_sections(repo: Path, profile: str, text: str) -> List[Issue]:
             )
         else:
             matched.append((key, idx))
+
+    for lineno, line in headings:
+        key, method = resolve_section_key_for_heading(line, [k for k, _ in patterns])
+        if not key or not method:
+            continue
+        canonical = canonical_heading_line(key)
+        if line == canonical:
+            continue
+        issues.append(
+            Issue(
+                issue_id="section-misnamed",
+                category="schema-violation",
+                severity="low",
+                repo=repo.name,
+                doc_file=str(repo / "README.md"),
+                evidence=f"Heading at line {lineno} should be `{canonical}`.",
+                recommended_fix="Rename heading to the canonical section title.",
+                auto_fixable=True,
+                normalized_from=line,
+                normalized_to=canonical,
+                normalization_method=method,
+            )
+        )
+
+    for key, pattern in patterns:
+        matches = find_matching_heading_indices(headings, pattern)
+        if len(matches) > 1:
+            issues.append(
+                Issue(
+                    issue_id="duplicate-canonical-section",
+                    category="schema-violation",
+                    severity="low",
+                    repo=repo.name,
+                    doc_file=str(repo / "README.md"),
+                    evidence=f"Multiple headings match required section `{key}`.",
+                    recommended_fix="Manually consolidate duplicated section content under one canonical heading.",
+                    auto_fixable=False,
+                )
+            )
 
     ordered_idxs = [idx for _, idx in matched]
     if ordered_idxs != sorted(ordered_idxs):
@@ -469,42 +621,76 @@ def make_bootstrap_readme(repo: Path, skill_dirs: List[str]) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def normalize_headings(text: str) -> str:
-    mappings = {
-        "## How To Add (Skills CLI)": "## Quick Start (Vercel Skills CLI)",
-        "## Included skills": "## Skill Guide (When To Use What)",
-        "## Included Skills": "## Skill Guide (When To Use What)",
-        "## How to add (Skills CLI)": "## Quick Start (Vercel Skills CLI)",
-    }
-    out = text
-    for old, new in mappings.items():
-        out = out.replace(old, new)
-    return out
+def normalize_headings(text: str, profile: str) -> Tuple[str, List[HeadingNormalizationEvent]]:
+    allowed_keys = expected_section_keys(profile)
+    out_lines = text.splitlines()
+    events: List[HeadingNormalizationEvent] = []
+
+    for idx, line in enumerate(out_lines):
+        if not line.startswith("## "):
+            continue
+        section_key, method = resolve_section_key_for_heading(line, allowed_keys)
+        if not section_key or not method:
+            continue
+        canonical = canonical_heading_line(section_key)
+        if line == canonical:
+            continue
+        out_lines[idx] = canonical
+        events.append(
+            HeadingNormalizationEvent(
+                line=idx + 1,
+                section_key=section_key,
+                original_heading=line,
+                normalized_heading=canonical,
+                normalization_method=method,
+            )
+        )
+
+    out = "\n".join(out_lines)
+    if text.endswith("\n"):
+        out += "\n"
+    return out, events
 
 
-def append_missing_sections(text: str, repo_name: str, profile: str) -> Tuple[str, bool]:
-    changed = False
-    out = normalize_headings(text)
+def append_missing_sections(text: str, repo_name: str, profile: str) -> Tuple[str, List[str], List[HeadingNormalizationEvent]]:
+    out, events = normalize_headings(text, profile)
+    appended: List[str] = []
 
-    expected = ["what", "guide", "quickstart", "individual", "find_cli", "layout", "notes", "license"]
-    if profile == "public-curated":
-        expected.extend(["find_skill", "keywords"])
-
-    for key in expected:
-        pattern = dict(SECTION_PATTERNS_CORE + PUBLIC_EXTRA_PATTERNS).get(key)
-        if pattern and re.search(pattern, out, flags=re.IGNORECASE | re.MULTILINE):
+    for key in expected_section_keys(profile):
+        pattern = SECTION_PATTERNS[key]
+        if re.search(pattern, out, flags=re.IGNORECASE | re.MULTILINE):
             continue
         template = SECTION_TEMPLATES[key].format(repo=repo_name)
         if not out.endswith("\n"):
             out += "\n"
         out += "\n" + template + "\n"
-        changed = True
+        appended.append(key)
 
-    return out, changed
+    return out, appended, events
 
 
-def apply_fixes_for_repo(repo: Path, profile: str, skill_dirs: List[str]) -> Tuple[bool, List[Dict[str, str]], Optional[str]]:
-    fixes: List[Dict[str, str]] = []
+def dedupe_skills_add_lines(text: str) -> Tuple[str, int]:
+    line_rx = re.compile(r"^\s*npx\s+skills\s+add\s+[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:@[A-Za-z0-9_.-]+)?\s*$")
+    out_lines: List[str] = []
+    seen: set[str] = set()
+    removed = 0
+
+    for line in text.splitlines():
+        if line_rx.match(line):
+            if line in seen:
+                removed += 1
+                continue
+            seen.add(line)
+        out_lines.append(line)
+
+    out = "\n".join(out_lines)
+    if text.endswith("\n"):
+        out += "\n"
+    return out, removed
+
+
+def apply_fixes_for_repo(repo: Path, profile: str, skill_dirs: List[str]) -> Tuple[bool, List[Dict[str, object]], Optional[str]]:
+    fixes: List[Dict[str, object]] = []
     readme = repo / "README.md"
 
     if not readme.exists():
@@ -515,13 +701,49 @@ def apply_fixes_for_repo(repo: Path, profile: str, skill_dirs: List[str]) -> Tup
         return False, fixes, "README.md missing and profile is not bootstrap"
 
     before = read_text(readme)
-    after, changed = append_missing_sections(before, repo.name, profile)
-    if changed:
-        write_text(readme, after)
-        fixes.append({"repo": repo.name, "file": str(readme), "rule": "append-missing-sections", "status": "applied", "reason": "bounded section insertion"})
-        return True, fixes, None
+    after, appended, normalization_events = append_missing_sections(before, repo.name, profile)
+    deduped_after, removed_command_count = dedupe_skills_add_lines(after)
+    after = deduped_after
 
-    return False, fixes, "no bounded fix applied"
+    changed = after != before
+    if not changed:
+        return False, fixes, "no bounded fix applied"
+
+    write_text(readme, after)
+
+    if normalization_events:
+        fixes.append(
+            {
+                "repo": repo.name,
+                "file": str(readme),
+                "rule": "normalize-misnamed-headings",
+                "status": "applied",
+                "reason": f"normalized {len(normalization_events)} heading(s)",
+                "events": [event.to_dict() for event in normalization_events],
+            }
+        )
+    if appended:
+        fixes.append(
+            {
+                "repo": repo.name,
+                "file": str(readme),
+                "rule": "append-missing-sections",
+                "status": "applied",
+                "reason": f"bounded section insertion: {', '.join(appended)}",
+            }
+        )
+    if removed_command_count > 0:
+        fixes.append(
+            {
+                "repo": repo.name,
+                "file": str(readme),
+                "rule": "dedupe-install-commands",
+                "status": "applied",
+                "reason": f"removed {removed_command_count} duplicate install command line(s)",
+            }
+        )
+
+    return True, fixes, None
 
 
 def summarize_markdown(report: Dict[str, object]) -> str:
@@ -598,7 +820,7 @@ def main() -> int:
     schema_issues: List[Issue] = []
     command_issues: List[Issue] = []
     errors: List[Dict[str, str]] = []
-    fixes_applied: List[Dict[str, str]] = []
+    fixes_applied: List[Dict[str, object]] = []
 
     for repo in repos:
         profile = detect_profile(repo.name)
