@@ -3,4 +3,4 @@ version = 1
 name = "productivity-skills-dev"
 
 [setup]
-script = ""
+script = ".codex/environments/setup-uv-cache.sh"
