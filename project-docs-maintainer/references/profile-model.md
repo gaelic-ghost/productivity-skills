@@ -9,7 +9,7 @@
 Requirements:
 
 - core README schema
-- `## Customization Workflow Matrix` required
+- compact `## Table of Contents` required
 - `## Install individually by Skill or Skill Pack` required
 - `## Update Skills` required
 - discoverability sections

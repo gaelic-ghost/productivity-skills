@@ -4,17 +4,21 @@
 
 1. Run Context
 2. Discovery Summary
-3. Unaligned Repositories
-4. Fixes Applied
-5. Remaining Issues
-6. Modified Files (no commit)
-7. Errors/Warnings
+3. Profile Assignments
+4. Schema Violations
+5. Command Integrity Issues
+6. Fixes Applied
+7. Post-Fix Status
+8. Errors
 
 ## JSON Top-Level Keys
 
 - `run_context`
 - `repos_scanned`
-- `unaligned_repos`
+- `repos_with_issues`
+- `profile_assignments`
+- `schema_violations`
+- `command_integrity_issues`
 - `fixes_applied`
 - `post_fix_status`
 - `errors`
@@ -24,7 +28,7 @@
 - `issue_id`
 - `category`
 - `severity`
-- `language_scope`
+- `repo`
 - `doc_file`
 - `evidence`
 - `recommended_fix`

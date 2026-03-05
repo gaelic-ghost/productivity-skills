@@ -5,7 +5,7 @@ For public curated repos, include:
 - `npx skills add <owner/repo>`
 - `npx skills add <owner/repo> --all`
 - `npx skills add <owner/repo> --skill <skill-name>` for individual install examples
-- `## Customization Workflow Matrix`
+- `## Table of Contents` near the top (compact, H2 links only)
 - `## Install individually by Skill or Skill Pack`
 - `## Update Skills` section with `npx skills check` and `npx skills update`
 - at least 3 realistic `npx skills find` examples

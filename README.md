@@ -2,36 +2,33 @@
 
 Curated Codex skills for productivity workflows, maintenance automation, and operational hygiene.
 
-## Standards and Guidance
+For standards and applicability guidance, see [AGENTS.md](./AGENTS.md).
 
-Always consult these resources when creating, updating, reviewing, or sharing skills:
+## Table of Contents
 
-- Skill Creator workflow: [$skill-creator](/Users/galew/.codex/skills/.system/skill-creator/SKILL.md)
-- OpenAI Codex Skills: [developers.openai.com/codex/skills](https://developers.openai.com/codex/skills)
-- OpenAI Codex AGENTS.md configuration: [developers.openai.com/codex/configuration/agents-md](https://developers.openai.com/codex/configuration/agents-md)
-- Claude Code Features Overview: [code.claude.com/docs/en/features-overview](https://code.claude.com/docs/en/features-overview)
-- Claude Code Skills: [code.claude.com/docs/en/skills](https://code.claude.com/docs/en/skills)
-- Anthropic Agent Skills Best Practices: [platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
-- Claude Code Plugins: [code.claude.com/docs/en/plugins](https://code.claude.com/docs/en/plugins)
-- The Complete Guide to Building Skill for Claude (PDF): [resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf)
-- Agent Skills Standard: [agentskills.io/home](https://agentskills.io/home)
-- Vercel KB Guidance: [vercel.com/kb/guide/agent-skills-creating-installing-and-sharing-reusable-agent-context](https://vercel.com/kb/guide/agent-skills-creating-installing-and-sharing-reusable-agent-context)
+- [What These Agent Skills Help With](#what-these-agent-skills-help-with)
+- [Skill Guide (When To Use What)](#skill-guide-when-to-use-what)
+- [Quick Start (Vercel Skills CLI)](#quick-start-vercel-skills-cli)
+- [Install individually by Skill or Skill Pack](#install-individually-by-skill-or-skill-pack)
+- [Update Skills](#update-skills)
+- [More resources for similar Skills](#more-resources-for-similar-skills)
+- [Repository Layout](#repository-layout)
+- [Notes](#notes)
+- [Keywords](#keywords)
+- [License](#license)
 
-Applicability guidance:
+## What These Agent Skills Help With
 
-- Always consult Skill Creator workflow for skill lifecycle work.
-- Consult OpenAI Codex docs when behavior is OpenAI/Codex specific.
-- Consult Claude docs when behavior is Claude skills/plugins specific.
-- Consult Agent Skills Standard and Vercel guidance for cross-platform standards alignment.
+This repository packages reusable Codex skills for orchestrating installs, maintaining docs and roadmaps, and managing personal productivity workflows.
 
-## Active Skills
+## Skill Guide (When To Use What)
 
 - `project-skills-orchestrator-agent`
   - Front-door router that selects the best skill and prints exact install commands for missing skills.
 - `project-docs-maintainer`
-  - Audit and safely align workspace docs and `*-skills` README standards using explicit modes.
+  - Audit and safely align workspace docs, `*-skills` README standards, and checklist roadmap maintenance using explicit modes.
 - `project-roadmap-maintainer`
-  - Maintain a canonical checklist-style `ROADMAP.md` for milestones, tickets, and exit criteria.
+  - Deprecated compatibility shim that redirects roadmap requests to `project-docs-maintainer` roadmap mode.
 - `project-workspace-cleaner`
   - Read-only workspace hygiene scanner that ranks cleanup chores.
 - `things-reminders-manager`
@@ -39,18 +36,14 @@ Applicability guidance:
 - `things-digest-generator`
   - Weekly Things digest generator with prioritized next-step suggestions.
 
-## Migration Table (Old -> New)
+## Quick Start (Vercel Skills CLI)
 
-| Old skill name | New skill name |
-| --- | --- |
-| `docs-alignment-maintainer` | `project-docs-maintainer` |
-| `skills-readme-alignment-maintainer` | `project-docs-maintainer` (merged mode) |
-| `project-roadmap-manager` | `project-roadmap-maintainer` |
-| `workspace-cleanup-audit` | `project-workspace-cleaner` |
-| `things-mcp-reminder-wrapper` | `things-reminders-manager` |
-| `things-week-ahead-digest` | `things-digest-generator` |
+Use the Vercel `skills` CLI to install from this repository.
 
-## Quick Start
+```bash
+# Install from this repository (interactive picker)
+npx skills add gaelic-ghost/productivity-skills
+```
 
 Install the orchestrator first:
 
@@ -60,10 +53,14 @@ npx skills add gaelic-ghost/productivity-skills --skill project-skills-orchestra
 
 Then ask your agent to route your request and suggest any missing installs.
 
-## Install Individually
+```bash
+# Install all skills from this repository
+npx skills add gaelic-ghost/productivity-skills --all
+```
+
+## Install individually by Skill or Skill Pack
 
 ```bash
-npx skills add gaelic-ghost/productivity-skills --skill project-skills-orchestrator-agent
 npx skills add gaelic-ghost/productivity-skills --skill project-docs-maintainer
 npx skills add gaelic-ghost/productivity-skills --skill project-roadmap-maintainer
 npx skills add gaelic-ghost/productivity-skills --skill project-workspace-cleaner
@@ -71,18 +68,40 @@ npx skills add gaelic-ghost/productivity-skills --skill things-reminders-manager
 npx skills add gaelic-ghost/productivity-skills --skill things-digest-generator
 ```
 
-Install all skills:
+Roadmap note:
 
-```bash
-npx skills add gaelic-ghost/productivity-skills --all
-```
+- Canonical roadmap handling is now through `$project-docs-maintainer` with `mode=roadmap_maintenance`.
+- `project-roadmap-maintainer` remains installable as a compatibility shim for one deprecation cycle.
 
-## Update Installed Skills
+## Update Skills
 
 ```bash
 npx skills check
 npx skills update
 ```
+
+## More resources for similar Skills
+
+### Find Skills like these with the `skills` CLI by Vercel — [vercel-labs/skills](https://github.com/vercel-labs/skills)
+
+```bash
+npx skills find "skills orchestration"
+npx skills find "readme alignment maintainer"
+npx skills find "things productivity automation"
+```
+
+### Find Skills like these with the `Find Skills` Agent Skill by Vercel — [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills)
+
+```bash
+# `Find Skills` is a part of Vercel's `agent-skills` repo
+npx skills add vercel-labs/agent-skills --skill find-skills
+```
+
+Then ask your Agent for help finding a skill for "" or ""
+
+### Leaderboard
+
+- Skills catalog: [skills.sh](https://skills.sh/)
 
 ## Repository Layout
 
@@ -105,9 +124,9 @@ npx skills update
 ## Notes
 
 - Each skill keeps `SKILL.md` concise and pushes deeper details into `references/`.
-- `project-docs-maintainer` supports `workspace_docs_alignment` and `skills_readme_alignment` modes.
+- `project-docs-maintainer` supports `workspace_docs_alignment`, `skills_readme_alignment`, and `roadmap_maintenance` modes.
 
-## Search Keywords
+## Keywords
 
 Codex skills, skills orchestration, docs alignment, roadmap maintenance, workspace cleanup, Things reminders, Things digest, productivity automation.
 

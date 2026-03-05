@@ -2,7 +2,7 @@
 
 - No TODO/TBD placeholders remain.
 - Section presence/order matches profile requirements.
-- `## Customization Workflow Matrix` exists where required.
+- `## Table of Contents` exists where required and is compact (H2 links only, no nested bullets).
 - `## Install individually by Skill or Skill Pack` exists where required.
 - `## Update Skills` exists and includes `npx skills check` plus `npx skills update`.
 - `## More resources for similar Skills` exists where required.

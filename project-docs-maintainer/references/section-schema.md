@@ -4,9 +4,9 @@
 
 1. `# <repo-name>`
 2. one-line value proposition
-3. `## What These Agent Skills Help With`
-4. `## Skill Guide (When To Use What)`
-5. `## Customization Workflow Matrix`
+3. `## Table of Contents` (compact, H2 links only)
+4. `## What These Agent Skills Help With`
+5. `## Skill Guide (When To Use What)`
 6. `## Quick Start (Vercel Skills CLI)`
 7. `## Install individually by Skill or Skill Pack`
 8. `## Update Skills`
@@ -15,6 +15,15 @@
 11. `## Notes`
 12. `## Keywords`
 13. `## License`
+
+## Table of Contents Rules
+
+- must be the first H2 section in README
+- use top-level bullets only (`- [Section](#fragment)`)
+- no nested bullets
+- no self-link to `#table-of-contents`
+- every TOC link must target an existing H2 heading
+- TOC should include every H2 heading except `Table of Contents`
 
 ## Public Profile Additions
 

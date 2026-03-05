@@ -1,98 +1,35 @@
 ---
 name: project-roadmap-maintainer
-description: Create and maintain repository-root ROADMAP.md using a checklist-first canonical format. Use when bootstrapping a roadmap, accepting or completing plans, updating milestone scope/status, migrating legacy roadmap tables, or keeping milestone progress, tickets, and exit criteria synchronized.
+description: Deprecated compatibility shim for roadmap maintenance. Redirects users to project-docs-maintainer roadmap mode while preserving existing invocation/install compatibility.
 ---
 
-# Project Roadmap Maintainer
+# Project Roadmap Maintainer (Deprecated Compatibility Shim)
 
-Maintain `ROADMAP.md` in the project root as the canonical roadmap source of truth.
+This skill remains available for compatibility during a deprecation cycle.
 
-## Workflow
+Canonical roadmap behavior now lives in:
 
-1. Load active customization config:
-   - Prefer `config/customization.yaml`.
-   - Fall back to `config/customization.template.yaml`.
-2. Locate `<project_root>/ROADMAP.md`.
-3. If missing, create `ROADMAP.md` using the checklist canonical format.
-4. Detect existing format:
-   - canonical checklist format, or
-   - legacy `Current Milestone` / `Milestones` table format.
-5. If legacy format is found, migrate in-place to checklist format.
-6. Apply requested roadmap update while keeping section consistency.
+- `$project-docs-maintainer` with `mode=roadmap_maintenance`
 
-## Canonical Format
+## Compatibility Workflow
 
-Required top-level sections:
+1. Acknowledge compatibility invocation.
+2. Redirect to canonical mode with equivalent intent:
+   - `Use $project-docs-maintainer with mode=roadmap_maintenance ...`
+3. Preserve user intent (`check-only` or `apply`) and target paths.
+4. Do not claim this shim is the canonical owner.
 
-- `Vision`
-- `Product principles`
-- `Milestone Progress`
-- Per-milestone sections with `Scope`, `Tickets`, and `Exit criteria`
+## Redirect Examples
 
-Optional preserved sections:
+- Legacy request: `Use $project-roadmap-maintainer to check roadmap consistency.`
+- Redirected request: `Use $project-docs-maintainer with mode=roadmap_maintenance and --run-mode check-only ...`
 
-- `Architectural decision log`
-- `Risks and mitigations`
-- `Backlog candidates`
-
-## Checklist Rules
-
-- Use markdown checkboxes only: `[ ]` and `[x]`.
-- Use `[P]` marker only for parallelizable ticket items.
-- Keep milestone numbering and names deterministic.
-- Keep `Milestone Progress` aligned with milestone section status.
-- Keep edits bounded to roadmap-relevant sections.
-
-## Legacy Migration Rules
-
-If legacy roadmap sections exist:
-
-1. Build milestone sections from legacy rows/details.
-2. Convert legacy status to checklist state in `Milestone Progress`.
-3. Preserve useful historical text under compatible sections.
-4. Remove superseded legacy sections after successful migration.
-5. Do not leave duplicated conflicting state.
-
-## Customization Workflow
-
-When user requests customization:
-
-1. Read `config/customization.yaml`; if missing, use `config/customization.template.yaml`.
-2. Confirm behavior for:
-   - `statusValues`
-   - `planHistoryVerbosity`
-   - `changeLogVerbosity`
-3. Propose 2-4 option bundles with one recommended default.
-4. Write `config/customization.yaml` with:
-   - `schemaVersion: 1`
-   - `isCustomized: true`
-   - `profile: <selected-profile>`
-5. Validate with a dry-run roadmap update and report behavior deltas.
-
-## AGENTS Snippets
-
-Use local snippet source:
-
-- `references/agents-snippets.md`
-
-Share snippets when users want reusable roadmap governance standards across multiple repositories.
-
-## Snippet Suggestion Workflow
-
-1. Detect requests for repeatable roadmap policy language or standards.
-2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
-3. Indicate recommended insertion point in `AGENTS.md`.
-4. Require explicit user confirmation before any `AGENTS.md` edit.
-5. Report suggested snippets separately from applied edits.
-
-## Automation Templates
-
-Use `$project-roadmap-maintainer` in automation prompts.
-
-- `references/automation-prompts.md`
+- Legacy request: `Use $project-roadmap-maintainer to migrate this roadmap.`
+- Redirected request: `Use $project-docs-maintainer with mode=roadmap_maintenance and --run-mode apply ...`
 
 ## References
 
-- `references/customization.md`
-- `references/config-schema.md`
-- `references/automation-prompts.md`
+- `../project-docs-maintainer/SKILL.md`
+- `../project-docs-maintainer/references/roadmap-automation-prompts.md`
+- `../project-docs-maintainer/references/roadmap-config-schema.md`
+- `../project-docs-maintainer/references/roadmap-customization.md`

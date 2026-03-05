@@ -65,11 +65,14 @@ Tickets:
 - [ ] Run stale-name sweeps and reference-integrity checks.
 - [ ] Validate each skill `agents/openai.yaml` against current SKILL intent.
 - [ ] Socialize `docs/agents-standards-snippets.md` for copy/paste adoption.
+- [x] Consolidate roadmap handling under `project-docs-maintainer` with `mode=roadmap_maintenance`.
+- [x] Keep `project-roadmap-maintainer` as a deprecation-cycle compatibility shim.
 
 Exit criteria:
 
 - [ ] No stale skill names remain outside migration docs.
 - [ ] Shared passive standards are documented and reusable.
+- [x] Canonical roadmap ownership is documented under `project-docs-maintainer`.
 
 ## Risks and mitigations
 

@@ -38,10 +38,10 @@ Never claim installation success until user confirms completion.
 ## Active Skills
 
 - `project-docs-maintainer`
-- `project-roadmap-maintainer`
 - `project-workspace-cleaner`
 - `things-reminders-manager`
 - `things-digest-generator`
+- `project-roadmap-maintainer` (deprecated compatibility shim)
 
 Use `references/skill-routing-matrix.md` for domain-to-skill mapping and composition patterns.
 

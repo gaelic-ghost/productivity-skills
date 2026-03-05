@@ -1,6 +1,6 @@
 ---
 name: project-docs-maintainer
-description: Audit and maintain project documentation alignment with a deterministic two-pass workflow. Use when repository docs drift from tooling/manifests, when *-skills README standards need profile-aware alignment, or when you need Markdown plus JSON reports with optional bounded fixes.
+description: Audit and maintain project documentation alignment plus checklist roadmap maintenance with a deterministic two-pass workflow. Use when repository docs drift from tooling/manifests, when *-skills README standards need profile-aware alignment, when roadmap checklists require migration/normalization, or when you need Markdown plus JSON reports with optional bounded fixes.
 ---
 
 # Project Docs Maintainer
@@ -11,6 +11,7 @@ Run documentation maintenance in explicit modes so behavior stays deterministic 
 
 - `workspace_docs_alignment`: general repository documentation drift checks and safe fixes.
 - `skills_readme_alignment`: profile-aware README standards checks and safe fixes for `*-skills` repositories.
+- `roadmap_maintenance`: checklist-style `ROADMAP.md` validation, migration, and bounded updates.
 
 ## Inputs
 
@@ -20,6 +21,7 @@ Pass runtime inputs from the calling prompt:
 - `--workspace <path>`
 - Optional `--exclude <path>` (repeatable)
 - Optional mode-specific flags shown below
+- For roadmap mode: `--project-root <path>`, optional `--roadmap-path <path>`, and `--run-mode <check-only|apply>`.
 
 ## Workflow
 
@@ -28,6 +30,7 @@ Pass runtime inputs from the calling prompt:
 3. Review issue categories and impacted repositories.
 4. If requested and safe, run pass 2 with `--apply-fixes`.
 5. Re-check touched repositories and report Markdown plus JSON results.
+6. For roadmap requests, run roadmap check-only or apply workflows using bounded `ROADMAP.md` edits.
 
 ## Commands
 
@@ -73,6 +76,26 @@ uv run python scripts/readme_alignment_maintainer.py \
   --json-out /tmp/readme-alignment-report.json
 ```
 
+`roadmap_maintenance` check-only:
+
+```bash
+uv run python scripts/roadmap_alignment_maintainer.py \
+  --project-root ~/Workspace/my-project \
+  --run-mode check-only \
+  --print-md \
+  --print-json
+```
+
+`roadmap_maintenance` apply:
+
+```bash
+uv run python scripts/roadmap_alignment_maintainer.py \
+  --project-root ~/Workspace/my-project \
+  --run-mode apply \
+  --md-out /tmp/roadmap-alignment-report.md \
+  --json-out /tmp/roadmap-alignment-report.json
+```
+
 ## Safety Rules
 
 - Never commit changes automatically.
@@ -81,10 +104,11 @@ uv run python scripts/readme_alignment_maintainer.py \
 - Keep broad AGENTS rewrites out-of-scope for automated fixes.
 - Allow snippet suggestion by default and only perform targeted `AGENTS.md` edits after explicit user approval.
 - Apply only bounded replacements and minimal structural normalization.
+- In `roadmap_maintenance` apply mode, edit only the target `ROADMAP.md` file.
 
 ## Output Contract
 
-Both modes must provide:
+All modes must provide:
 
 - Human-readable Markdown summary.
 - Machine-readable JSON report.
@@ -114,6 +138,7 @@ Templates:
 
 - `references/automation-prompts.md` for `workspace_docs_alignment`
 - `references/automation-prompts-skills-readme.md` for `skills_readme_alignment`
+- `references/roadmap-automation-prompts.md` for `roadmap_maintenance`
 
 ## References
 
@@ -132,3 +157,6 @@ Templates:
 - `references/seed-artifacts.md`
 - `references/automation-prompts.md`
 - `references/automation-prompts-skills-readme.md`
+- `references/roadmap-automation-prompts.md`
+- `references/roadmap-config-schema.md`
+- `references/roadmap-customization.md`

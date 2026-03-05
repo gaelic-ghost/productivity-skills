@@ -22,9 +22,9 @@ BOOTSTRAP_REPOS = {"a11y-skills"}
 EXPECTED_OWNER = "gaelic-ghost"
 
 CORE_SECTION_KEYS = [
+    "toc",
     "what",
     "guide",
-    "customization_matrix",
     "quickstart",
     "individual",
     "update_skills",
@@ -36,9 +36,9 @@ CORE_SECTION_KEYS = [
 ]
 
 SECTION_CANONICAL_HEADINGS = {
+    "toc": "Table of Contents",
     "what": "What These Agent Skills Help With",
     "guide": "Skill Guide (When To Use What)",
-    "customization_matrix": "Customization Workflow Matrix",
     "quickstart": "Quick Start (Vercel Skills CLI)",
     "individual": "Install individually by Skill or Skill Pack",
     "update_skills": "Update Skills",
@@ -50,9 +50,9 @@ SECTION_CANONICAL_HEADINGS = {
 }
 
 SECTION_PATTERNS = {
+    "toc": r"^##\s+Table of Contents\s*$",
     "what": r"^##\s+What These Agent Skills Help With\s*$",
     "guide": r"^##\s+Skill Guide \(When To Use What\)\s*$",
-    "customization_matrix": r"^##\s+Customization Workflow Matrix\s*$",
     "quickstart": r"^##\s+Quick Start \(Vercel Skills CLI\)\s*$",
     "individual": r"^##\s+Install individually by Skill or Skill Pack\s*$",
     "update_skills": r"^##\s+Update Skills\s*$",
@@ -99,11 +99,11 @@ LEGACY_MORE_RESOURCES_TOP_LEVEL_PATTERNS = {
 MORE_RESOURCES_ANCHOR_LINE = 'Then ask your Agent for help finding a skill for "" or ""'
 
 HEADING_ALIASES = {
+    "table of contents": "toc",
     "how to add (skills cli)": "quickstart",
     "how to add (vercel skills cli)": "quickstart",
     "how to add with skills cli": "quickstart",
     "quickstart (skills cli)": "quickstart",
-    "customization workflow matrix": "customization_matrix",
     "included skills": "guide",
     "included skill": "guide",
     "skills included": "guide",
@@ -118,7 +118,7 @@ HEADING_ALIASES = {
 }
 
 HIGH_CONFIDENCE_HEADING_PATTERNS = [
-    ("customization_matrix", re.compile(r"^customization\s+workflow\s+matrix$", re.IGNORECASE)),
+    ("toc", re.compile(r"^table\s+of\s+contents$", re.IGNORECASE)),
     ("quickstart", re.compile(r"^quick\s*start.*skills\s*cli$", re.IGNORECASE)),
     ("quickstart", re.compile(r"^how\s+to\s+add.*skills\s*cli$", re.IGNORECASE)),
     ("individual", re.compile(r"^install\s+(?:individually|individual)\s+by\s+skill\s+or\s+skill\s+pack$", re.IGNORECASE)),
@@ -142,14 +142,21 @@ MORE_RESOURCES_SUBSECTION_HIGH_CONFIDENCE_PATTERNS = [
 ]
 
 SECTION_TEMPLATES = {
+    "toc": (
+        "## Table of Contents\n\n"
+        "- [What These Agent Skills Help With](#what-these-agent-skills-help-with)\n"
+        "- [Skill Guide (When To Use What)](#skill-guide-when-to-use-what)\n"
+        "- [Quick Start (Vercel Skills CLI)](#quick-start-vercel-skills-cli)\n"
+        "- [Install individually by Skill or Skill Pack](#install-individually-by-skill-or-skill-pack)\n"
+        "- [Update Skills](#update-skills)\n"
+        "- [More resources for similar Skills](#more-resources-for-similar-skills)\n"
+        "- [Repository Layout](#repository-layout)\n"
+        "- [Notes](#notes)\n"
+        "- [Keywords](#keywords)\n"
+        "- [License](#license)\n"
+    ),
     "what": "## What These Agent Skills Help With\n\nDescribe the audience and the workflows this repository improves.\n",
     "guide": "## Skill Guide (When To Use What)\n\n- `<skill-name>`\n  - Use when ...\n  - Helps by ...\n",
-    "customization_matrix": (
-        "## Customization Workflow Matrix\n\n"
-        "| Skill | Chat Customization Flow (SKILL.md) | Durable Config (`template` + persisted `customization.yaml`) | Automation Knobs | README Migration Status |\n"
-        "| --- | --- | --- | --- | --- |\n"
-        "| `<skill-name>` | Yes | Yes | No | README removed |\n"
-    ),
     "quickstart": (
         "## Quick Start (Vercel Skills CLI)\n\n"
         "Use the Vercel `skills` CLI against this repository to install any skill directory you want to use. "
@@ -367,11 +374,11 @@ def canonical_heading_line(section_key: str) -> str:
 
 def expected_section_keys(profile: str) -> List[str]:
     if profile == "public-curated":
-        # Public READMEs include customization matrix and place keywords before license.
+        # Public READMEs require a compact TOC and place keywords before license.
         return [
+            "toc",
             "what",
             "guide",
-            "customization_matrix",
             "quickstart",
             "individual",
             "update_skills",
@@ -382,6 +389,136 @@ def expected_section_keys(profile: str) -> List[str]:
             "license",
         ]
     return list(CORE_SECTION_KEYS)
+
+
+def heading_to_fragment(heading: str) -> str:
+    fragment = heading.strip().lower()
+    fragment = re.sub(r"[`]", "", fragment)
+    fragment = re.sub(r"[^\w\s-]", "", fragment)
+    fragment = re.sub(r"\s+", "-", fragment)
+    fragment = re.sub(r"-+", "-", fragment).strip("-")
+    return fragment
+
+
+def check_compact_toc(repo: Path, text: str) -> List[Issue]:
+    issues: List[Issue] = []
+    lines = text.splitlines()
+    headings = heading_lines(text)
+
+    h2_headings = [(lineno, line) for lineno, line in headings if line.startswith("## ")]
+    if not h2_headings:
+        return issues
+
+    toc_range = find_section_line_range(lines, SECTION_PATTERNS["toc"])
+    if toc_range is None:
+        # Missing TOC is handled by canonical required-section checks.
+        return issues
+
+    first_h2_lineno, first_h2_heading = h2_headings[0]
+    if first_h2_heading != "## Table of Contents":
+        issues.append(
+            Issue(
+                issue_id="toc-placement",
+                category="schema-violation",
+                severity="low",
+                repo=repo.name,
+                doc_file=str(repo / "README.md"),
+                evidence=f"First H2 heading is `{first_h2_heading}` at line {first_h2_lineno}; TOC must be the first H2.",
+                recommended_fix="Place `## Table of Contents` before other H2 sections.",
+                auto_fixable=False,
+            )
+        )
+
+    start_idx, end_idx = toc_range
+    toc_lines = lines[start_idx + 1 : end_idx]
+    toc_entries: List[Tuple[int, str]] = []
+    for idx, raw in enumerate(toc_lines, start=start_idx + 2):
+        line = raw.rstrip()
+        if not line.strip():
+            continue
+        if re.match(r"^\s+-\s+", line):
+            issues.append(
+                Issue(
+                    issue_id="toc-not-compact",
+                    category="schema-violation",
+                    severity="low",
+                    repo=repo.name,
+                    doc_file=str(repo / "README.md"),
+                    evidence=f"Nested TOC bullet detected at line {idx}: `{line.strip()}`",
+                    recommended_fix="Use top-level H2 links only (no nested bullets).",
+                    auto_fixable=False,
+                )
+            )
+            continue
+        match = re.match(r"^-\s+\[(.+)\]\(#([^)]+)\)\s*$", line)
+        if not match:
+            issues.append(
+                Issue(
+                    issue_id="toc-entry-invalid",
+                    category="schema-violation",
+                    severity="low",
+                    repo=repo.name,
+                    doc_file=str(repo / "README.md"),
+                    evidence=f"Invalid TOC entry at line {idx}: `{line.strip()}`",
+                    recommended_fix="Use `- [Section](#fragment)` entries only in TOC.",
+                    auto_fixable=False,
+                )
+            )
+            continue
+        toc_entries.append((idx, match.group(2).strip().lower()))
+
+    h2_targets = {
+        heading_to_fragment(h[3:]): h
+        for _lineno, h in h2_headings
+        if h != "## Table of Contents"
+    }
+
+    seen_fragments = set()
+    for lineno, fragment in toc_entries:
+        if fragment == "table-of-contents":
+            issues.append(
+                Issue(
+                    issue_id="toc-self-link",
+                    category="schema-violation",
+                    severity="low",
+                    repo=repo.name,
+                    doc_file=str(repo / "README.md"),
+                    evidence=f"TOC links to itself at line {lineno}.",
+                    recommended_fix="Do not include `Table of Contents` in TOC entries.",
+                    auto_fixable=False,
+                )
+            )
+        if fragment not in h2_targets:
+            issues.append(
+                Issue(
+                    issue_id="toc-broken-link",
+                    category="schema-violation",
+                    severity="low",
+                    repo=repo.name,
+                    doc_file=str(repo / "README.md"),
+                    evidence=f"TOC link `#{fragment}` at line {lineno} does not target an H2 heading.",
+                    recommended_fix="Point TOC links to existing H2 headings.",
+                    auto_fixable=False,
+                )
+            )
+        seen_fragments.add(fragment)
+
+    missing_h2_links = [frag for frag in h2_targets if frag not in seen_fragments]
+    if missing_h2_links:
+        issues.append(
+            Issue(
+                issue_id="toc-missing-h2-links",
+                category="schema-violation",
+                severity="low",
+                repo=repo.name,
+                doc_file=str(repo / "README.md"),
+                evidence=f"TOC does not include H2 sections: {', '.join(f'#{frag}' for frag in missing_h2_links)}",
+                recommended_fix="Add TOC entries for every H2 heading except `Table of Contents`.",
+                auto_fixable=False,
+            )
+        )
+
+    return issues
 
 
 def heading_body(line: str) -> str:
@@ -727,6 +864,7 @@ def check_sections(repo: Path, profile: str, text: str) -> List[Issue]:
         )
 
     issues.extend(check_more_resources_subsections(repo, profile, all_lines))
+    issues.extend(check_compact_toc(repo, text))
 
     return issues
 
@@ -1041,6 +1179,19 @@ def make_bootstrap_readme(repo: Path, skill_dirs: List[str]) -> str:
         "",
         "Codex skills focused on accessibility and speech-friendly automation workflows.",
         "",
+        "## Table of Contents",
+        "",
+        "- [What These Agent Skills Help With](#what-these-agent-skills-help-with)",
+        "- [Skill Guide (When To Use What)](#skill-guide-when-to-use-what)",
+        "- [Quick Start (Vercel Skills CLI)](#quick-start-vercel-skills-cli)",
+        "- [Install individually by Skill or Skill Pack](#install-individually-by-skill-or-skill-pack)",
+        "- [Update Skills](#update-skills)",
+        "- [More resources for similar Skills](#more-resources-for-similar-skills)",
+        "- [Repository Layout](#repository-layout)",
+        "- [Notes](#notes)",
+        "- [Keywords](#keywords)",
+        "- [License](#license)",
+        "",
         "## What These Agent Skills Help With",
         "",
         "This repository supports accessibility-centered agent workflows and practical speech/readability tooling.",
@@ -1078,12 +1229,6 @@ def make_bootstrap_readme(repo: Path, skill_dirs: List[str]) -> str:
         lines.extend(["```bash", f"npx skills add {EXPECTED_OWNER}/{repo.name} --skill {skill}", "```", ""])
 
     lines.extend([
-        "## Customization Workflow Matrix",
-        "",
-        "| Skill | Chat Customization Flow (SKILL.md) | Durable Config (`template` + persisted `customization.yaml`) | Automation Knobs | README Migration Status |",
-        "| --- | --- | --- | --- | --- |",
-        "| `<skill-name>` | Yes | Yes | No | README removed |",
-        "",
         "## Update Skills",
         "",
         "```bash",
