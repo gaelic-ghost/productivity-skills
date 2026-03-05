@@ -34,6 +34,7 @@ No-findings handling:
 
 Failure handling:
 - If access is blocked or directory traversal fails, report the impacted path and continue with remaining paths when possible.
+- If any path is skipped, include a partial-results warning and list skipped paths in both markdown/operator output and JSON output.
 ```
 
 ## Codex CLI Automation Prompt Template (codex exec)
@@ -58,6 +59,7 @@ Write outputs to:
 
 If there are no findings, output exactly `No findings.`.
 If any path is inaccessible, include a partial-results warning and list skipped paths.
+Reserve exact `No findings.` for complete runs with no findings and no skipped paths.
 ```
 
 Optional command wrapper:

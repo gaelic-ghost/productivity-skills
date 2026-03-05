@@ -10,6 +10,7 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Any, Dict
 
@@ -45,6 +46,10 @@ class Activity:
     overdue: int = 0
     completed_7d: int = 0
     checklist_hints: int = 0
+
+
+class InputLoadError(Exception):
+    """Raised when a required digest input cannot be loaded deterministically."""
 
 
 def parse_args() -> argparse.Namespace:
@@ -177,14 +182,34 @@ def resolve_settings(args_config: str) -> tuple[Dict[str, Any], Path, str]:
     return settings, active_path, source
 
 
-def read_items(path: str) -> list[dict[str, Any]]:
-    with open(path, "r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+def read_items(path: str, flag_name: str, required: bool = True) -> list[dict[str, Any]]:
+    input_path = Path(path).expanduser()
+    if not input_path.exists():
+        qualifier = "required" if required else "provided"
+        raise InputLoadError(f"Input error: missing {qualifier} input file for {flag_name}: {input_path}")
+    try:
+        with input_path.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except FileNotFoundError:
+        qualifier = "required" if required else "provided"
+        raise InputLoadError(f"Input error: missing {qualifier} input file for {flag_name}: {input_path}") from None
+    except PermissionError:
+        raise InputLoadError(f"Input error: unreadable input path for {flag_name}: {input_path} (permission denied)") from None
+    except IsADirectoryError:
+        raise InputLoadError(f"Input error: unreadable input path for {flag_name}: {input_path} (is a directory)") from None
+    except JSONDecodeError as exc:
+        raise InputLoadError(
+            f"Input error: invalid JSON in {flag_name}: {input_path} (line {exc.lineno}, column {exc.colno})"
+        ) from None
+    except OSError as exc:
+        raise InputLoadError(f"Input error: unreadable input path for {flag_name}: {input_path} ({exc.strerror or exc})") from None
     if isinstance(payload, list):
         return [item for item in payload if isinstance(item, dict)]
     if isinstance(payload, dict) and isinstance(payload.get("items"), list):
         return [item for item in payload["items"] if isinstance(item, dict)]
-    raise ValueError(f"Unsupported JSON shape in {path}")
+    raise InputLoadError(
+        f"Input error: unsupported JSON shape in {flag_name}: {input_path} (expected a list or object with an items array)"
+    )
 
 
 def parse_date(raw: str) -> date | None:
@@ -490,11 +515,15 @@ def main() -> int:
         else datetime.now().astimezone().date()
     )
 
-    areas = read_items(args.areas)
-    projects = read_items(args.projects)
-    open_todos = read_items(args.open_todos)
-    recent_done = read_items(args.recent_done) if args.recent_done else []
-    detailed_todos = read_items(args.detailed_todos) if args.detailed_todos else []
+    try:
+        areas = read_items(args.areas, "--areas")
+        projects = read_items(args.projects, "--projects")
+        open_todos = read_items(args.open_todos, "--open-todos")
+        recent_done = read_items(args.recent_done, "--recent-done", required=False) if args.recent_done else []
+        detailed_todos = read_items(args.detailed_todos, "--detailed-todos", required=False) if args.detailed_todos else []
+    except InputLoadError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
 
     if not open_todos and not recent_done:
         print("No findings.")

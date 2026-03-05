@@ -83,6 +83,13 @@ class Finding:
     suggested_cleanup: str
 
 
+@dataclass
+class SkippedPath:
+    path: str
+    operation: str
+    error: str
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Scan repositories in a workspace for cleanup chores (read-only)."
@@ -250,16 +257,36 @@ def find_repositories(workspace_root: Path) -> List[Path]:
     return sorted(set(repos))
 
 
-def dir_size_and_latest_mtime(path: Path) -> Tuple[int, float]:
+def record_skipped_path(skipped_paths: List[SkippedPath], path: Path, operation: str, error: OSError) -> None:
+    skipped_paths.append(
+        SkippedPath(
+            path=str(path),
+            operation=operation,
+            error=error.strerror or str(error),
+        )
+    )
+
+
+def dir_size_and_latest_mtime(path: Path, skipped_paths: List[SkippedPath]) -> Tuple[int, float]:
     total = 0
-    latest = path.stat().st_mtime if path.exists() else 0.0
-    for root, dirs, files in os.walk(path, topdown=True, followlinks=False):
+    try:
+        latest = path.stat().st_mtime if path.exists() else 0.0
+    except OSError as exc:
+        record_skipped_path(skipped_paths, path, "stat directory", exc)
+        return 0, 0.0
+
+    def on_walk_error(exc: OSError) -> None:
+        walk_path = Path(exc.filename) if exc.filename else path
+        record_skipped_path(skipped_paths, walk_path, "walk directory", exc)
+
+    for root, dirs, files in os.walk(path, topdown=True, followlinks=False, onerror=on_walk_error):
         dirs[:] = [d for d in dirs if d not in {".git"}]
         for filename in files:
             file_path = Path(root) / filename
             try:
                 stat_result = file_path.stat()
-            except OSError:
+            except OSError as exc:
+                record_skipped_path(skipped_paths, file_path, "stat file", exc)
                 continue
             total += stat_result.st_size
             if stat_result.st_mtime > latest:
@@ -312,10 +339,15 @@ def scan_repo(
     dir_rules: Dict[str, Tuple[str, int]],
     file_ext_rules: Dict[str, Tuple[str, int]],
     severity_cutoffs: Dict[str, int],
-) -> List[Finding]:
+) -> Tuple[List[Finding], List[SkippedPath]]:
     findings: List[Finding] = []
+    skipped_paths: List[SkippedPath] = []
 
-    for root, dirs, files in os.walk(repo, topdown=True, followlinks=False):
+    def on_walk_error(exc: OSError) -> None:
+        walk_path = Path(exc.filename) if exc.filename else repo
+        record_skipped_path(skipped_paths, walk_path, "walk directory", exc)
+
+    for root, dirs, files in os.walk(repo, topdown=True, followlinks=False, onerror=on_walk_error):
         root_path = Path(root)
 
         for dirname in list(dirs):
@@ -324,7 +356,7 @@ def scan_repo(
                 continue
 
             candidate = root_path / dirname
-            size_bytes, latest_mtime = dir_size_and_latest_mtime(candidate)
+            size_bytes, latest_mtime = dir_size_and_latest_mtime(candidate, skipped_paths)
             dirs.remove(dirname)
             if size_bytes < min_bytes:
                 continue
@@ -358,7 +390,8 @@ def scan_repo(
                 continue
             try:
                 stat_result = candidate_file.stat()
-            except OSError:
+            except OSError as exc:
+                record_skipped_path(skipped_paths, candidate_file, "stat file", exc)
                 continue
             if stat_result.st_size < min_bytes:
                 continue
@@ -388,7 +421,7 @@ def scan_repo(
                 )
             )
 
-    return findings
+    return findings, skipped_paths
 
 
 def age_bonus_with_now(latest_mtime: float, stale_days: int, now_ts: float) -> int:
@@ -433,13 +466,27 @@ def summarize_by_repo(findings: List[Finding]) -> List[dict]:
     return rows
 
 
-def text_report(findings: List[Finding], repo_summary: List[dict], scanned_repo_count: int, workspace: Path) -> str:
+def text_report(
+    findings: List[Finding],
+    repo_summary: List[dict],
+    scanned_repo_count: int,
+    workspace: Path,
+    skipped_paths: List[SkippedPath],
+) -> str:
     lines: List[str] = []
     lines.append("Workspace Cleanup Audit (read-only)")
     lines.append(f"Workspace: {workspace}")
     lines.append(f"Repositories scanned: {scanned_repo_count}")
     lines.append(f"Findings: {len(findings)}")
+    lines.append(f"Partial results: {'yes' if skipped_paths else 'no'}")
     lines.append("")
+
+    if skipped_paths:
+        lines.append("Partial-results warning")
+        lines.append("Some paths could not be scanned. Skipped paths:")
+        for item in skipped_paths:
+            lines.append(f"- {item.path} [{item.operation}]: {item.error}")
+        lines.append("")
 
     if findings:
         lines.append("Ranked Findings")
@@ -453,8 +500,11 @@ def text_report(findings: List[Finding], repo_summary: List[dict], scanned_repo_
             lines.append(f"   reason: {finding.why_flagged}")
             lines.append(f"   cleanup: {finding.suggested_cleanup}")
         lines.append("")
-    else:
+    elif not skipped_paths:
         lines.append("No findings.")
+        lines.append("")
+    else:
+        lines.append("No findings in accessible paths.")
         lines.append("")
 
     lines.append("Repo Summary")
@@ -509,18 +559,19 @@ def main() -> int:
 
     repos = find_repositories(workspace)
     all_findings: List[Finding] = []
+    skipped_paths: List[SkippedPath] = []
     for repo in repos:
-        all_findings.extend(
-            scan_repo(
-                repo,
-                min_bytes=min_bytes,
-                stale_days=stale_days,
-                now_ts=now_ts,
-                dir_rules=dir_rules,
-                file_ext_rules=file_ext_rules,
-                severity_cutoffs=severity_cutoffs,
-            )
+        repo_findings, repo_skipped = scan_repo(
+            repo,
+            min_bytes=min_bytes,
+            stale_days=stale_days,
+            now_ts=now_ts,
+            dir_rules=dir_rules,
+            file_ext_rules=file_ext_rules,
+            severity_cutoffs=severity_cutoffs,
         )
+        all_findings.extend(repo_findings)
+        skipped_paths.extend(repo_skipped)
 
     ranked = sorted_findings(all_findings)[:max_findings]
     repo_summary = summarize_by_repo(ranked)
@@ -530,6 +581,8 @@ def main() -> int:
         "scanned_repo_count": len(repos),
         "config_source": config_source,
         "active_config_path": str(active_config_path),
+        "partial_results": bool(skipped_paths),
+        "skipped_paths": [asdict(item) for item in skipped_paths],
         "findings": [asdict(item) for item in ranked],
         "repo_summary": repo_summary,
     }
@@ -537,7 +590,7 @@ def main() -> int:
     if args.json:
         print(json.dumps(payload, indent=2))
     else:
-        print(text_report(ranked, repo_summary, len(repos), workspace))
+        print(text_report(ranked, repo_summary, len(repos), workspace, skipped_paths))
 
     return 0
 

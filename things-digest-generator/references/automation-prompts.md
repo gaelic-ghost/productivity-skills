@@ -40,7 +40,7 @@ No-findings handling:
 - Otherwise keep the run in inbox triage.
 
 Failure handling:
-- If MCP and JSON fallback are both unavailable, report exactly what input is missing and what permission/path is required.
+- If MCP and JSON fallback are both unavailable, report one deterministic `Input error:` message that names the missing file, unreadable path, invalid JSON, or unsupported JSON shape.
 ```
 
 ## Codex CLI Automation Prompt Template (codex exec)
@@ -76,7 +76,7 @@ Then emit:
 
 Write digest to <DIGEST_MD_PATH>.
 If there is no actionable data, output exactly `No findings.`.
-If inputs are missing, report precise missing files/permissions and stop.
+If inputs fail, report one deterministic `Input error:` message and stop.
 ```
 
 Optional command wrapper:

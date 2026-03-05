@@ -57,7 +57,7 @@ Build a repeatable Things planning digest from Things MCP data or equivalent JSO
 
 - Never modify Things data unless explicitly requested.
 - If MCP is unavailable, report the missing permission and use JSON fallback when provided.
-- If neither MCP nor JSON inputs are available, report the exact missing inputs and stop.
+- If neither MCP nor JSON inputs are available, stop and report one deterministic `Input error:` message that names the missing file, unreadable path, invalid JSON, or unsupported JSON shape.
 
 ## References
 

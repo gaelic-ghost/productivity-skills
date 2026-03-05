@@ -26,9 +26,10 @@ Run a read-only scan over repositories in a workspace root and rank cleanup chor
 
 1. Resolve settings using the documented precedence.
 2. Run `scripts/scan_workspace_cleanup.py`.
-3. Rank findings by severity, score, size, repo, and directory.
-4. Return the ranked findings plus repo-level totals.
-5. If nothing crosses the thresholds, report the user-facing clean result.
+3. Record skipped paths when traversal or stat operations fail, then continue scanning remaining accessible paths.
+4. Rank findings by severity, score, size, repo, and directory.
+5. Return the ranked findings plus repo-level totals.
+6. If there are no findings and no skipped paths, report the user-facing clean result.
 
 ## Output Contract
 
@@ -44,7 +45,9 @@ Each finding includes:
 - `suggested_cleanup`
 
 - Repo summary includes total flagged size and finding counts per severity.
+- JSON output includes `partial_results` and `skipped_paths`.
 - For user-facing clean runs, output exactly `No findings.`
+- If any path is skipped, return a partial-results warning and list skipped paths instead of using the clean-run message.
 
 ## Guardrails
 

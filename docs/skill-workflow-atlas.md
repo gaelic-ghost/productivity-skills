@@ -739,7 +739,9 @@ flowchart TD
 **Outputs**
 
 - Partial-results warning
-- Findings report or clean-run result from accessible paths
+- Findings report or `No findings in accessible paths.` from accessible paths
+- `partial_results: true`
+- `skipped_paths` list in JSON output
 
 **Public Interface / UX**
 
@@ -959,7 +961,7 @@ flowchart TD
 
 **Outputs**
 
-- Failure output describing the exact missing files, permissions, or paths required
+- Failure output as one deterministic `Input error:` line describing the missing file, unreadable path, invalid JSON, or unsupported JSON shape
 
 **Public Interface / UX**
 

@@ -44,3 +44,12 @@ Formatting rules:
 - If a section has no data, write `None currently` instead of omitting the section.
 - If there are no open todos and no recent completed todos in scope, output exactly `No findings.`
 - Do not prepend an out-of-band metadata comment before the markdown output.
+
+Failure format:
+- If required or provided JSON inputs cannot be used, stop with one stderr line that begins `Input error:`.
+- Use these exact categories in the error text:
+  - `missing required input file`
+  - `missing provided input file`
+  - `unreadable input path`
+  - `invalid JSON`
+  - `unsupported JSON shape`
