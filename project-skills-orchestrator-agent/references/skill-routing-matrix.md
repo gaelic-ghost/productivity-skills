@@ -4,11 +4,25 @@
 
 | Intent signal | Primary skill | Optional secondary skill |
 | --- | --- | --- |
-| Roadmap planning, milestone updates, ROADMAP.md maintenance | `project-docs-maintainer` (`mode=roadmap_maintenance`) | `project-roadmap-maintainer` (deprecated shim) |
-| Docs drift, README standards, docs alignment audits | `project-docs-maintainer` (`mode=workspace_docs_alignment` or `mode=skills_readme_alignment`) | `project-roadmap-maintainer` (deprecated shim only for legacy invocation routing) |
-| Things reminders, rescheduling, update-vs-create todo mutation | `things-reminders-manager` | `things-digest-generator` |
-| Things weekly planning digest, priorities, week-ahead summary | `things-digest-generator` | `things-reminders-manager` |
-| Workspace cleanup chores, stale artifacts, disk hygiene ranking | `project-workspace-cleaner` | `project-docs-maintainer` |
+| Roadmap planning, milestone updates, ROADMAP.md maintenance | `project-docs-maintainer` (`mode=roadmap_maintenance`) | none |
+| `*-skills` README drift, README standards audits | `project-docs-maintainer` (`mode=skills_readme_maintenance`) | none |
+| Things reminders, rescheduling, update-vs-create todo mutation | `things-reminders-manager` | `things-digest-generator` only when the user explicitly asks for planning context too |
+| Things weekly planning digest, priorities, week-ahead summary | `things-digest-generator` | `things-reminders-manager` only when the user explicitly asks for reminder mutation too |
+| Workspace cleanup chores, stale artifacts, disk hygiene ranking | `project-workspace-cleaner` | none |
+
+## Composition Rule
+
+- Default to exactly one selected skill.
+- Add a second skill only when the user explicitly asks for both:
+  - planning plus mutation
+  - audit plus follow-up action
+  - digest plus reminder mutation
+- Otherwise do not compose.
+
+## Legacy Handling
+
+- Route to `project-roadmap-maintainer` only when the user explicitly targets the legacy roadmap-maintainer surface.
+- Treat `skills_readme_alignment` as a compatibility alias for `skills_readme_maintenance`, not as a primary route.
 
 ## Snippet Routing Hints
 
@@ -18,12 +32,10 @@ Use AGENTS snippet suggestions when intent includes:
 - "give me AGENTS policy snippets"
 - "create reusable guidance"
 - "copy/paste standards"
-Snippet sources:
 
-- Orchestrator: `references/agents-snippets.md`
-- Routed skill: `<selected-skill>/references/agents-snippets.md`
+Snippet source:
 
-Prefer routed skill snippets first, then orchestrator snippets for generic policy blocks.
+- Shared: `../docs/agents-standards-snippets.md`
 
 ## Install Guidance
 
@@ -33,11 +45,15 @@ When a selected skill is unavailable, output:
 npx skills add gaelic-ghost/productivity-skills --skill <skill-name>
 ```
 
-For multi-skill composition, output one command per missing skill.
+`Install (if needed)` must be:
+
+- `none` when all required skills are already available
+- one exact install command when one required skill is missing
+- one exact install command per skill only for an allowed two-skill composed route
 
 ## Example Response Shape
 
 - `Selected Skill`: `project-docs-maintainer`
-- `Why`: Request asks for README/docs alignment or roadmap maintenance through canonical docs-maintainer modes.
+- `Why`: Request asks for `*-skills` README maintenance or roadmap maintenance through canonical docs-maintainer modes.
 - `Install (if needed)`: `npx skills add gaelic-ghost/productivity-skills --skill project-docs-maintainer`
-- `Next Prompt`: Use `$project-docs-maintainer` with `mode=skills_readme_alignment` (or `mode=roadmap_maintenance`) and appropriate target path.
+- `Next Prompt`: Use `$project-docs-maintainer` with `mode=skills_readme_maintenance` or `mode=roadmap_maintenance` and the appropriate target path.

@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Docs Maintainer"
-  short_description: "Audit and safely align project docs, skills README standards, and roadmap checklists."
-  default_prompt: "Use $project-docs-maintainer with mode=workspace_docs_alignment, mode=skills_readme_alignment, or mode=roadmap_maintenance to run audit-first maintenance and optional bounded fixes with Markdown plus JSON reporting."
+  short_description: "Canonical maintainer for skills READMEs and checklist roadmap docs."
+  default_prompt: "Use $project-docs-maintainer with mode=skills_readme_maintenance or mode=roadmap_maintenance. Run the read-only variant first, keep fixes bounded to the selected mode, and return the matching Markdown plus JSON report."

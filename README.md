@@ -19,22 +19,25 @@ For standards and applicability guidance, see [AGENTS.md](./AGENTS.md).
 
 ## What These Agent Skills Help With
 
-This repository packages reusable Codex skills for orchestrating installs, maintaining docs and roadmaps, and managing personal productivity workflows.
+This repository packages reusable Codex skills for canonical docs maintenance, skill routing, read-only workspace hygiene, and Things planning/reminder workflows.
 
 ## Skill Guide (When To Use What)
 
 - `project-skills-orchestrator-agent`
-  - Front-door router that selects the best skill and prints exact install commands for missing skills.
+  - Front-door router that selects the right canonical skill and prints exact install commands for missing skills.
 - `project-docs-maintainer`
-  - Audit and safely align workspace docs, `*-skills` README standards, and checklist roadmap maintenance using explicit modes.
-- `project-roadmap-maintainer`
-  - Deprecated compatibility shim that redirects roadmap requests to `project-docs-maintainer` roadmap mode.
+  - Canonical maintainer for `*-skills` README drift and checklist roadmap maintenance through explicit modes.
 - `project-workspace-cleaner`
   - Read-only workspace hygiene scanner that ranks cleanup chores.
 - `things-reminders-manager`
   - Deterministic Things reminder create/update workflow with duplicate and date safeguards.
 - `things-digest-generator`
   - Weekly Things digest generator with prioritized next-step suggestions.
+
+Compatibility only:
+
+- `project-roadmap-maintainer`
+  - Thin redirect shim for legacy roadmap-maintainer prompts. Prefer `project-docs-maintainer` for all new work.
 
 ## Quick Start (Vercel Skills CLI)
 
@@ -62,16 +65,14 @@ npx skills add gaelic-ghost/productivity-skills --all
 
 ```bash
 npx skills add gaelic-ghost/productivity-skills --skill project-docs-maintainer
-npx skills add gaelic-ghost/productivity-skills --skill project-roadmap-maintainer
 npx skills add gaelic-ghost/productivity-skills --skill project-workspace-cleaner
 npx skills add gaelic-ghost/productivity-skills --skill things-reminders-manager
 npx skills add gaelic-ghost/productivity-skills --skill things-digest-generator
 ```
 
-Roadmap note:
+Compatibility note:
 
-- Canonical roadmap handling is now through `$project-docs-maintainer` with `mode=roadmap_maintenance`.
-- `project-roadmap-maintainer` remains installable as a compatibility shim for one deprecation cycle.
+- Install `project-roadmap-maintainer` only when you must preserve a legacy prompt or install surface.
 
 ## Update Skills
 
@@ -86,7 +87,7 @@ npx skills update
 
 ```bash
 npx skills find "skills orchestration"
-npx skills find "readme alignment maintainer"
+npx skills find "skills readme maintenance"
 npx skills find "things productivity automation"
 ```
 
@@ -124,11 +125,14 @@ Then ask your Agent for help finding a skill for "" or ""
 ## Notes
 
 - Each skill keeps `SKILL.md` concise and pushes deeper details into `references/`.
-- `project-docs-maintainer` supports `workspace_docs_alignment`, `skills_readme_alignment`, and `roadmap_maintenance` modes.
+- `project-docs-maintainer` supports canonical `skills_readme_maintenance` and `roadmap_maintenance` modes.
+- Deprecated compatibility surfaces remain minimal and should not be used for new prompts.
+- Shared `AGENTS.md` snippet blocks live in `docs/agents-standards-snippets.md`.
+- Cross-skill workflow diagrams and Agent+Skill UX maps live in `docs/skill-workflow-atlas.md`.
 
 ## Keywords
 
-Codex skills, skills orchestration, docs alignment, roadmap maintenance, workspace cleanup, Things reminders, Things digest, productivity automation.
+Codex skills, skills orchestration, skills README maintenance, roadmap maintenance, workspace cleanup, Things reminders, Things digest, productivity automation.
 
 ## License
 

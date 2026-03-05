@@ -33,5 +33,13 @@ Applicability guidance:
 - Keep skill instructions deterministic, concise, and safety-forward.
 - Never auto-commit or auto-install; report required commands and wait for user confirmation.
 - Keep cross-cutting standards in shared docs, and keep specialized procedures in skill-local references.
+- Use `docs/agents-standards-snippets.md` as the canonical shared source for reusable `AGENTS.md` snippets; do not maintain duplicated per-skill copies.
+- Use `docs/skill-workflow-atlas.md` as the canonical repo-level reference for workflow diagrams, branch paths, workflow inputs/outputs, and Agent+Skill end-user UX.
+- Prefer logically grouped skills over splitting adjacent workflows into separate skills.
+- Within a grouped skill, define one primary workflow path and keep variants subordinate to that path.
+- Do not create a separate skill for an adjacent workflow unless it has materially different tools, inputs, outputs, and audience.
+- Use the same names for the same concepts across `SKILL.md`, `agents/openai.yaml`, references, automation prompts, and scripts.
+- If config changes workflow decisions or output contracts, surface that in the main workflow instead of hiding it only in references.
+- When docs and scripts disagree on a workflow contract, fix the script or explicitly narrow the documented contract so they match.
 
 See `docs/agents-standards-snippets.md` for reusable copy/paste blocks.

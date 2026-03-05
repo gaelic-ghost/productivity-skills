@@ -28,7 +28,9 @@ Execution policy:
 - Never modify Things data unless explicitly requested.
 
 Output contract:
-- Produce the four sections in order: Snapshot, Recently Active, Week/Weekend Ahead, Suggestions.
+- If actionable data exists, produce markdown beginning with `# Things Planning Digest - YYYY-MM-DD`.
+- Include `## Executive Summary` only when `outputStyle=executive`.
+- Then produce the sections in order: Snapshot, Recently Active, Week/Weekend Ahead, Suggestions.
 - Keep tone concise and operational.
 - Include concrete task/project names where available.
 - Write final digest to <DIGEST_MD_PATH>.
@@ -64,7 +66,9 @@ If mode is JSON:
   - <OPEN_TODOS_JSON_PATH>
   - <RECENT_DONE_JSON_PATH>
 
-Produce a markdown digest with sections:
+Produce a markdown digest that starts with `# Things Planning Digest - YYYY-MM-DD`.
+If `outputStyle=executive`, include `## Executive Summary` before the standard sections.
+Then emit:
 1) Snapshot
 2) Recently Active
 3) Week/Weekend Ahead

@@ -5,93 +5,65 @@ description: Generate a week-ahead Things planning digest with recent activity, 
 
 # Things Digest Generator
 
-Build a repeatable Things planning digest with four sections:
-
-- Snapshot
-- Recently Active
-- Week/Weekend Ahead
-- Suggestions
+Build a repeatable Things planning digest from Things MCP data or equivalent JSON exports.
 
 ## Inputs
 
-Collect data with Things MCP tools:
-
-1. `things_read_areas`
-2. `things_read_projects` with `status="open"`
-3. `things_read_todos` with `status="open"`
-4. `things_read_todos` with `status="completed"` and `completed_after=<today-7d>`
-5. Optional `things_read_todo` for detailed notes/checklist signals
-
-If any call fails due to permissions, report the missing permission and continue with best available data.
+- Preferred data source: Things MCP reads
+  - `things_read_areas`
+  - `things_read_projects` with `status="open"`
+  - `things_read_todos` with `status="open"`
+  - `things_read_todos` with `status="completed"` and `completed_after=<today-7d>`
+  - Optional `things_read_todo` for checklist or note signals
+- JSON fallback for deterministic script usage:
+  - `--areas`
+  - `--projects`
+  - `--open-todos`
+  - optional `--recent-done`
+  - optional `--detailed-todos`
+- Optional overrides:
+  - `--days-ahead`
+  - `--due-soon-days`
+  - `--top-projects`
+  - `--top-areas`
+  - `--max-suggestions`
+  - `--open-count-cap`
+  - `--output-style`
+  - `--config`
+  - `--today`
 
 ## Workflow
 
-1. Load active customization config:
-   - Prefer `config/customization.yaml`.
-   - Fall back to `config/customization.template.yaml`.
-2. Build urgency buckets from open todos.
-3. Score recent activity by project and area.
-4. Identify top active projects/areas.
-5. Generate configured number of concrete suggestions.
-6. Format output using `references/output-format.md`.
+1. Resolve settings from CLI overrides, `config/customization.yaml`, `config/customization.template.yaml`, then script defaults.
+2. Prefer live Things MCP reads; fall back to JSON inputs when MCP is unavailable or when deterministic script execution is required.
+3. Build urgency buckets and activity scores from open and recently completed todos.
+4. Rank top projects and areas, then generate bounded suggestions.
+5. If there are no open todos and no recent completed todos, output exactly `No findings.`
+6. Otherwise render the digest using the canonical section order in `references/output-format.md`.
 
-## Script Usage
+## Output Contract
 
-Use `scripts/build_digest.py` for deterministic scoring/formatting:
+- Return markdown that begins at `# Things Planning Digest - YYYY-MM-DD`.
+- Return these sections in order after the title:
+  - `Executive Summary` only when `outputStyle=executive`
+  - `Snapshot`
+  - `Recently Active`
+  - `Week/Weekend Ahead`
+  - `Suggestions`
+- Use exact task, project, and area names where available.
+- If there are no open todos and no recent completed todos in scope, output exactly `No findings.`
 
-```bash
-uv run --with pyyaml python scripts/build_digest.py \
-  --areas areas.json \
-  --projects projects.json \
-  --open-todos open_todos.json \
-  --recent-done recent_done.json
-```
+## Guardrails
 
-Configuration precedence:
-
-1. CLI flags
-2. `config/customization.yaml`
-3. `config/customization.template.yaml`
-4. script defaults
-
-## Customization Workflow
-
-1. Read `config/customization.yaml`; if missing, use `config/customization.template.yaml`.
-2. Confirm:
-   - planning windows
-   - top project/area counts
-   - scoring weights
-   - suggestion cap/style
-3. Propose 2-4 option bundles with one recommended default.
-4. Write `config/customization.yaml` with `schemaVersion: 1`, `isCustomized: true`, and profile.
-5. Validate by generating a sample digest and reporting behavior deltas.
-
-## AGENTS Snippets
-
-Use local snippet source:
-
-- `references/agents-snippets.md`
-
-Share snippets when users request reusable planning, reporting, or standards text across repositories.
-
-## Snippet Suggestion Workflow
-
-1. Detect requests for repeatable digest/planning standards.
-2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
-3. Provide minimal adaptation notes for planning windows and output style.
-4. Require explicit user confirmation before editing any `AGENTS.md`.
-5. Report suggested snippets separately from applied edits.
-
-## Automation Templates
-
-Use `$things-digest-generator` in automation prompts.
-
-- `references/automation-prompts.md`
+- Never modify Things data unless explicitly requested.
+- If MCP is unavailable, report the missing permission and use JSON fallback when provided.
+- If neither MCP nor JSON inputs are available, report the exact missing inputs and stop.
 
 ## References
 
-- `references/suggestion-rules.md`
 - `references/output-format.md`
 - `references/customization.md`
 - `references/config-schema.md`
+- `references/suggestion-rules.md`
 - `references/automation-prompts.md`
+- `../docs/agents-standards-snippets.md`

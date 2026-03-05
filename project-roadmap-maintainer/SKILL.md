@@ -1,31 +1,40 @@
 ---
 name: project-roadmap-maintainer
-description: Deprecated compatibility shim for roadmap maintenance. Redirects users to project-docs-maintainer roadmap mode while preserving existing invocation/install compatibility.
+description: Compatibility-only redirect for legacy roadmap maintenance invocations. Use only when a prompt explicitly names `project-roadmap-maintainer` or depends on that legacy surface, then redirect to `project-docs-maintainer` with `mode=roadmap_maintenance`.
 ---
 
-# Project Roadmap Maintainer (Deprecated Compatibility Shim)
+# Project Roadmap Maintainer
 
-This skill remains available for compatibility during a deprecation cycle.
+This skill is not a canonical maintainer. It exists only to preserve legacy prompts.
 
-Canonical roadmap behavior now lives in:
+## Inputs
 
-- `$project-docs-maintainer` with `mode=roadmap_maintenance`
+- A legacy roadmap request that explicitly targets `$project-roadmap-maintainer`
+- Preserve:
+  - project root
+  - roadmap path
+  - run intent (`check-only` or `apply`)
 
-## Compatibility Workflow
+## Workflow
 
-1. Acknowledge compatibility invocation.
-2. Redirect to canonical mode with equivalent intent:
-   - `Use $project-docs-maintainer with mode=roadmap_maintenance ...`
-3. Preserve user intent (`check-only` or `apply`) and target paths.
-4. Do not claim this shim is the canonical owner.
+1. Acknowledge that this is a compatibility-only invocation.
+2. Redirect immediately to `$project-docs-maintainer` with `mode=roadmap_maintenance`.
+3. Preserve the original target path and run intent.
+4. Hand off to the canonical roadmap references for behavior details.
 
-## Redirect Examples
+## Output Contract
 
-- Legacy request: `Use $project-roadmap-maintainer to check roadmap consistency.`
-- Redirected request: `Use $project-docs-maintainer with mode=roadmap_maintenance and --run-mode check-only ...`
+- Return a redirect, not an independent roadmap workflow.
+- The redirect must state:
+  - canonical skill: `$project-docs-maintainer`
+  - canonical mode: `roadmap_maintenance`
+  - preserved run intent and target path
 
-- Legacy request: `Use $project-roadmap-maintainer to migrate this roadmap.`
-- Redirected request: `Use $project-docs-maintainer with mode=roadmap_maintenance and --run-mode apply ...`
+## Guardrails
+
+- Do not present this skill as the owner of roadmap maintenance behavior.
+- Do not duplicate roadmap rules or schemas here.
+- Keep compatibility wording brief.
 
 ## References
 

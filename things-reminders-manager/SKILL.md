@@ -7,77 +7,74 @@ description: Manage Things reminders and todo create/update requests with a dete
 
 Use an update-first workflow for Things reminder requests.
 
+## Inputs
+
+- Reminder intent:
+  - create
+  - reschedule
+  - correct an existing task
+- Scheduling phrase or absolute date/time
+- Optional timezone override
+- Effective settings may come from:
+  - explicit user override
+  - `config/customization.yaml`
+  - `config/customization.template.yaml`
+  - workflow defaults
+- Workflow settings:
+  - `timezone`
+  - `defaultReminderTime`
+  - `duplicatePolicy`
+  - `onUpdateWithoutToken`
+  - `requireAbsoluteDateInConfirmation`
+
 ## Workflow
 
-1. Resolve the local date anchor first.
+1. Resolve the current local date/time.
    - Run `date '+%Y-%m-%d %H:%M:%S %Z %z'`.
-   - Default to `America/New_York` unless user specifies a different timezone.
-2. Check Things MCP readiness.
-   - Run `things_capabilities`.
-   - Run `things_auth_get_status`.
-   - If updates are likely, run `things_validate_token_config`.
-3. Normalize relative scheduling terms into absolute dates.
-4. Search for matching open tasks before creating new ones.
-   - Prefer `things_find_todos` with focused query.
-   - Fall back to `things_read_todos` when needed.
-5. Choose mutation path with duplicate protection.
-   - Single clear match and correction intent: update.
-   - No match: create.
-   - Multiple likely matches: ask user to disambiguate.
-6. Enforce auth safety.
-   - If update requires token and token is unavailable, stop and report exact blocker.
-7. Execute mutation.
-   - Create: `things_add_todo`
-   - Update: `things_update_todo`
-8. Report deterministic result.
-   - action (`created` or `updated`)
-   - task title
-   - normalized absolute schedule
+2. Load effective settings from override, config, then defaults.
+   - Use `timezone` for schedule normalization.
+   - Use `defaultReminderTime` when the user gives a date without a time and the workflow needs a default time.
+3. Check Things MCP readiness and auth.
+   - `things_capabilities`
+   - `things_auth_get_status`
+   - `things_validate_token_config` before any likely update path
+4. Normalize the requested schedule into an absolute date/time using the effective `timezone`.
+5. Search candidate open tasks before creating anything new.
+   - Prefer `things_find_todos`
+   - Fall back to `things_read_todos` when needed
+6. Apply `duplicatePolicy`.
+   - `update-first`: update on a single clear correction/reschedule match, otherwise create or disambiguate
+   - `ask-first`: stop when a plausible duplicate exists and ask the user to choose
+   - `always-create`: skip update matching and create a new task unless the user explicitly asked to modify an existing one
+7. Apply `onUpdateWithoutToken` if the chosen path requires an update and token access is unavailable.
+   - `block-and-report`: stop with `action=blocked`
+   - `ask-to-create-duplicate`: ask whether to create a new task instead
+8. Execute the selected create or update path.
+   - create: `things_add_todo`
+   - update: `things_update_todo`
+9. Confirm the result using `requireAbsoluteDateInConfirmation`.
+   - When `true`, confirm in absolute form with timezone.
+
+## Output Contract
+
+- Return:
+  - `action`: `created`, `updated`, or `blocked`
+  - task title
+  - normalized absolute schedule
+  - blockers, when present
+- Confirm dates in absolute form with timezone in user-visible output.
 
 ## Guardrails
 
-- Never assume relative dates without resolving current local date.
-- Never claim updates succeeded without tool confirmation.
-- Never silently create duplicates when update intent is clear.
-- Never hide auth source/status details.
-
-## AGENTS Snippets
-
-Use local snippet source:
-
-- `references/agents-snippets.md`
-
-Share snippets when users request reusable standards for date handling, safety defaults, or MCP workflow policies.
-
-## Snippet Suggestion Workflow
-
-1. Detect requests for reusable reminder-management policy language.
-2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
-3. Provide minimal adaptation notes (timezone and confirmation expectations).
-4. Require explicit user confirmation before editing any `AGENTS.md`.
-5. Report what was suggested versus what was applied.
-
-## Customization Workflow
-
-1. Read `config/customization.yaml`; if missing, read `config/customization.template.yaml`.
-2. Confirm:
-   - timezone
-   - default reminder time
-   - duplicate policy
-   - token-missing behavior
-3. Propose 2-3 option bundles with one recommended default.
-4. Write `config/customization.yaml` with `schemaVersion: 1`, `isCustomized: true`, and profile.
-5. Validate with one simulated create flow and one update flow.
-
-## Automation Templates
-
-Use `$things-reminders-manager` in automation prompts.
-
-- `references/automation-prompts.md`
+- Never assume relative dates without resolving the current local date.
+- Never silently create a duplicate when update intent is clear.
+- Never claim mutation success without tool confirmation.
+- If an update requires token access and token access is missing, block and report the exact blocker.
 
 ## References
 
-- `references/mcp-sequence.md`
 - `references/customization.md`
+- `references/mcp-sequence.md`
 - `references/config-schema.md`
 - `references/automation-prompts.md`
+- `../docs/agents-standards-snippets.md`

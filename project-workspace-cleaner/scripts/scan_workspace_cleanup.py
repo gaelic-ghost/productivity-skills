@@ -454,7 +454,7 @@ def text_report(findings: List[Finding], repo_summary: List[dict], scanned_repo_
             lines.append(f"   cleanup: {finding.suggested_cleanup}")
         lines.append("")
     else:
-        lines.append("No findings above threshold.")
+        lines.append("No findings.")
         lines.append("")
 
     lines.append("Repo Summary")

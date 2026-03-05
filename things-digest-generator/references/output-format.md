@@ -1,14 +1,19 @@
 # Digest Output Format
 
-Use this exact section order.
+Use this output order.
 
 ```markdown
 # Things Planning Digest - YYYY-MM-DD
 
+## Executive Summary
+- Open todos: <count>
+- Immediate risk: <overdue count> overdue, <due-soon count> due soon
+- Top focus: <project or None currently>
+
 ## Snapshot
 - Open todos: <count>
 - Overdue: <count>
-- Due in next 72h: <count>
+- Due in next <dueSoonDays>d: <count>
 - Recently completed (7d): <count>
 - Most active area: <area>
 
@@ -33,6 +38,9 @@ Use this exact section order.
 ```
 
 Formatting rules:
+- Include `## Executive Summary` only when `outputStyle=executive`.
 - Keep the full digest under ~220 words unless the user asks for detail.
 - Use exact task/project names from Things data.
 - If a section has no data, write `None currently` instead of omitting the section.
+- If there are no open todos and no recent completed todos in scope, output exactly `No findings.`
+- Do not prepend an out-of-band metadata comment before the markdown output.

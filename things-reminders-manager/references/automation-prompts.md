@@ -4,13 +4,14 @@
 
 Use [$things-reminders-manager](/Users/galew/Workspace/productivity-skills/things-reminders-manager/SKILL.md).
 
-Process reminder requests for Things using update-first behavior:
-1. Resolve local date/time in America/New_York.
-2. Verify Things auth status before any update path.
-3. Search existing open tasks and avoid duplicates.
-4. Update existing task when intent is correction/reschedule.
-5. Create new task only when no suitable match exists.
-6. Return absolute date/time confirmations.
+Process reminder requests for Things using one settings-driven workflow:
+1. Resolve current local date/time.
+2. Load effective settings (`timezone`, `defaultReminderTime`, `duplicatePolicy`, `onUpdateWithoutToken`, `requireAbsoluteDateInConfirmation`).
+3. Verify Things auth status before any update path.
+4. Normalize the requested schedule using the effective timezone and default reminder time when needed.
+5. Search existing open tasks and apply `duplicatePolicy`.
+6. If update auth is missing, apply `onUpdateWithoutToken`.
+7. Return `created`, `updated`, or `blocked` with absolute date/time confirmation when required.
 
 ## Codex CLI Template
 

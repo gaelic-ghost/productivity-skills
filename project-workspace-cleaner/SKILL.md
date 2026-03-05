@@ -5,50 +5,30 @@ description: Scan workspace repositories for cleanup opportunities using a read-
 
 # Project Workspace Cleaner
 
-Run a read-only scan over repositories in `~/Workspace` and rank cleanup chores by severity.
+Run a read-only scan over repositories in a workspace root and rank cleanup chores by severity.
+
+## Inputs
+
+- Optional CLI overrides:
+  - `--workspace`
+  - `--min-mb`
+  - `--stale-days`
+  - `--max-findings`
+  - `--config`
+  - `--json`
+- Config precedence:
+  1. CLI flags
+  2. `config/customization.yaml`
+  3. `config/customization.template.yaml`
+  4. script defaults
 
 ## Workflow
 
-1. Load active customization config:
-   - Prefer `config/customization.yaml`.
-   - Fall back to `config/customization.template.yaml`.
+1. Resolve settings using the documented precedence.
 2. Run `scripts/scan_workspace_cleanup.py`.
-3. Review top-ranked findings first.
-4. Report findings with severity, repo, directory, category, size, and reason.
-5. Provide cleanup recommendations as text only.
-
-## Commands
-
-Default scan:
-
-```bash
-uv run --with pyyaml python scripts/scan_workspace_cleanup.py
-```
-
-Custom workspace root:
-
-```bash
-uv run --with pyyaml python scripts/scan_workspace_cleanup.py --workspace ~/Workspace
-```
-
-Machine-readable output:
-
-```bash
-uv run --with pyyaml python scripts/scan_workspace_cleanup.py --json
-```
-
-Tuned thresholds:
-
-```bash
-uv run --with pyyaml python scripts/scan_workspace_cleanup.py --min-mb 100 --stale-days 90
-```
-
-Configuration precedence:
-
-1. CLI flags
-2. `config/customization.yaml`
-3. `config/customization.template.yaml`
-4. script defaults
+3. Rank findings by severity, score, size, repo, and directory.
+4. Return the ranked findings plus repo-level totals.
+5. If nothing crosses the thresholds, report the user-facing clean result.
 
 ## Output Contract
 
@@ -63,55 +43,20 @@ Each finding includes:
 - `why_flagged`
 - `suggested_cleanup`
 
-Report includes:
+- Repo summary includes total flagged size and finding counts per severity.
+- For user-facing clean runs, output exactly `No findings.`
 
-- top findings (sorted by severity then size)
-- repo summary (ranked by total flagged size)
-
-## Read-Only Rules
+## Guardrails
 
 - Never run destructive commands.
 - Never remove artifacts automatically.
 - Never write into scanned repositories.
 - Provide recommendations only.
 
-## AGENTS Snippets
-
-Use local snippet source:
-
-- `references/agents-snippets.md`
-
-Share snippets when users ask for reusable cleanup and audit policy standards.
-
-## Snippet Suggestion Workflow
-
-1. Detect cross-repo cleanup policy requests.
-2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
-3. Provide minimal adaptation notes for workspace-specific thresholds.
-4. Require explicit user confirmation before editing any `AGENTS.md`.
-5. Report suggested snippets and applied changes separately.
-
-## Customization Workflow
-
-1. Read `config/customization.yaml`; if missing, use `config/customization.template.yaml`.
-2. Confirm:
-   - workspace root
-   - thresholds (`minMb`, `staleDays`, `maxFindings`)
-   - severity cutoffs
-   - override rules
-3. Propose 2-4 option bundles with one recommended default.
-4. Write `config/customization.yaml` with `schemaVersion: 1`, `isCustomized: true`, and profile.
-5. Validate with a scan run and report behavior deltas.
-
-## Automation Templates
-
-Use `$project-workspace-cleaner` in automation prompts.
-
-- `references/automation-prompts.md`
-
 ## References
 
-- `references/patterns.md`
-- `references/customization.md`
 - `references/config-schema.md`
+- `references/customization.md`
 - `references/automation-prompts.md`
+- `references/patterns.md`
+- `../docs/agents-standards-snippets.md`

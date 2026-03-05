@@ -1,70 +1,41 @@
-# README vs project-docs-maintainer Alignment Report
+# README Workflow Divergence Report
 
 Date: 2026-03-05
-Scope: `productivity-skills` only (`README.md` and `project-docs-maintainer` references/checker behavior)
-Remediation status: Implemented for `skills_readme_alignment` workflow (pilot repo).
+Scope: `productivity-skills` root README plus `project-docs-maintainer` README-maintenance references and checker behavior.
+Status: aligned to the canonical `skills_readme_maintenance` naming and current section schema.
 
-## Scope Confirmation
+## Current Alignment State
 
-- Updated workflow scope: `skills_readme_alignment` for `*-skills` repositories.
-- Not changed: `workspace_docs_alignment` behavior in `docs_alignment_maintainer.py`.
+- Canonical README maintenance name: `skills_readme_maintenance`
+- Legacy compatibility alias: `skills_readme_alignment`
+  - retained for compatibility only
+  - no longer treated as a primary path in repo docs
+- Root `README.md` now emphasizes canonical skills first and keeps compatibility-only surfaces brief.
 
-## Contract Updates Implemented
+## Implemented Baseline
 
-### 1. Required section schema
+- Required public-curated README sections and TOC rules are aligned with the current checker contract.
+- Discoverability rules and install command patterns match the current `npx skills add ...` syntax.
+- Shared `AGENTS.md` snippet guidance now lives in `docs/agents-standards-snippets.md` instead of duplicated per-skill references.
+- `project-docs-maintainer` remains the canonical owner of README maintenance and roadmap maintenance behavior.
 
-- Removed `## Customization Workflow Matrix` from required section contract.
-- Added required compact `## Table of Contents` for profiled `*-skills` README files.
-
-### 2. TOC validation rules (new)
-
-- TOC must be first H2.
-- TOC must use top-level bullets only.
-- TOC entries must follow `- [Section](#fragment)` format.
-- TOC must not self-link.
-- TOC entries must target existing H2 headings.
-- TOC must include all H2 headings except `Table of Contents`.
-
-### 3. Reference document alignment
-
-- Updated:
-  - `/Users/galew/Workspace/productivity-skills/project-docs-maintainer/references/section-schema.md`
-  - `/Users/galew/Workspace/productivity-skills/project-docs-maintainer/references/discoverability-rules.md`
-  - `/Users/galew/Workspace/productivity-skills/project-docs-maintainer/references/profile-model.md`
-  - `/Users/galew/Workspace/productivity-skills/project-docs-maintainer/references/output-contract.md`
-- Result: references now match implemented checker contract and output shape.
-
-### 4. README pilot normalization (`productivity-skills`)
-
-- Added canonical required sections and heading names.
-- Added required `More resources` discoverability subsections and anchor line.
-- Added base install command and de-duplicated install command patterns.
-- Renamed `## Search Keywords` to canonical `## Keywords`.
-
-## Validation Output
-
-Read-only audit command:
+## Validation Command
 
 ```bash
-uv run python project-docs-maintainer/scripts/readme_alignment_maintainer.py \
+uv run python project-docs-maintainer/scripts/skills_readme_maintenance.py \
   --workspace /Users/galew/Workspace \
   --repo-glob 'productivity-skills' \
   --print-md \
   --print-json
 ```
 
-Current result:
+## Expected Clean Result
 
-- Repos with issues: `0`
-- Schema violations: `0`
-- Command integrity issues: `0`
+- `repos_with_issues`: `0`
+- `schema_violations`: `0`
+- `command_integrity_issues`: `0`
 
-## Potential Next Actions
+## Remaining Compatibility Notes
 
-1. Apply same normalized contract to other public-curated `*-skills` repos (`apple-dev-skills`, `python-skills`).
-2. Optionally add release-history enforcement in checker if that requirement should remain strict.
-3. Keep `workspace_docs_alignment` unchanged unless separately requested.
-
-## Validation Notes
-
-- `workspace_docs_alignment` CLI surface is unchanged (`docs_alignment_maintainer.py --help` verified).
+- Keep the legacy alias accepted in maintenance surfaces that must preserve backward compatibility.
+- Do not reintroduce alias-first wording in `README.md`, `SKILL.md`, or `agents/openai.yaml`.

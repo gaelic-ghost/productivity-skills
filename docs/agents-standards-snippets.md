@@ -1,6 +1,6 @@
 # AGENTS Standards Snippets
 
-Use these snippets as copy/paste starting points for repository-level `AGENTS.md` files.
+This file is the canonical shared source for reusable repository-level `AGENTS.md` snippets in this repo. Skill docs should reference this file directly instead of maintaining identical per-skill copies.
 
 ## Python Execution Baseline
 

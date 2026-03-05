@@ -8,9 +8,13 @@
 - `onUpdateWithoutToken`: `block-and-report`
 - `requireAbsoluteDateInConfirmation`: `true`
 
-## Behavior impact
+## Workflow impact
 
-- `update-first` minimizes accidental duplicate tasks.
-- `ask-first` is useful when titles are reused frequently.
+- `timezone` controls how relative dates are normalized into absolute confirmations.
+- `defaultReminderTime` supplies the time component when the request gives a date but no explicit time.
+- `update-first` minimizes accidental duplicate tasks by preferring updates on a single clear match.
+- `ask-first` pauses when a plausible duplicate exists and asks the user to choose.
 - `always-create` should only be used when duplicates are intentionally allowed.
-- `block-and-report` avoids hidden mutation failures when token access is missing.
+- `block-and-report` stops the workflow when update auth is missing.
+- `ask-to-create-duplicate` keeps the workflow moving by asking whether a new task should be created instead.
+- `requireAbsoluteDateInConfirmation=true` makes the final confirmation include the absolute date/time and timezone.

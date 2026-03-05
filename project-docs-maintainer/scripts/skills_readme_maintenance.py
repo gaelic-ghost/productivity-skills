@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Two-pass README alignment maintainer for *-skills repositories."""
+"""Two-pass skills README maintenance workflow for *-skills repositories."""
 
 from __future__ import annotations
 
@@ -210,7 +210,7 @@ SECTION_TEMPLATES = {
     "layout": "## Repository Layout\n\n```text\n.\n├── README.md\n└── <skill-directories>/\n```\n",
     "notes": "## Notes\n\n- Keep README commands and skill inventory synchronized.\n",
     "license": "## License\n\nSee [LICENSE](./LICENSE).\n",
-    "keywords": "## Keywords\n\nCodex skills, automation, workflows, documentation alignment.\n",
+    "keywords": "## Keywords\n\nCodex skills, automation, workflows, README maintenance.\n",
 }
 
 
@@ -283,7 +283,9 @@ class SkillsAddCommand:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Audit and optionally align README standards for *-skills repos")
+    parser = argparse.ArgumentParser(
+        description="Audit and optionally apply skills README maintenance for *-skills repos"
+    )
     parser.add_argument("--workspace", required=True, help="Workspace root")
     parser.add_argument("--repo-glob", default="*-skills", help="Repo directory glob")
     parser.add_argument("--exclude", action="append", default=[], help="Path to exclude (repeatable)")
@@ -1278,7 +1280,7 @@ def make_bootstrap_readme(repo: Path, skill_dirs: List[str]) -> str:
         "",
         "## Keywords",
         "",
-        "Codex skills, accessibility automation, speech workflows, documentation alignment.",
+        "Codex skills, accessibility automation, speech workflows, README maintenance.",
         "",
         "## License",
         "",

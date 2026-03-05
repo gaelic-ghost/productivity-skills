@@ -496,6 +496,10 @@ def main() -> int:
     recent_done = read_items(args.recent_done) if args.recent_done else []
     detailed_todos = read_items(args.detailed_todos) if args.detailed_todos else []
 
+    if not open_todos and not recent_done:
+        print("No findings.")
+        return 0
+
     digest = render_digest(
         areas=areas,
         projects=projects,
@@ -513,7 +517,6 @@ def main() -> int:
         open_count_cap=max(1, open_count_cap),
     )
 
-    print(f"<!-- config_source: {config_source}; active_config_path: {active_config_path} -->")
     print(digest)
     return 0
 

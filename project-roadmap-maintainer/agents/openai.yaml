@@ -1,4 +1,4 @@
 interface:
-  display_name: "Project Roadmap Maintainer (Deprecated Shim)"
-  short_description: "Compatibility wrapper that redirects roadmap maintenance to project-docs-maintainer roadmap mode."
-  default_prompt: "Use $project-docs-maintainer with mode=roadmap_maintenance and preserve the same roadmap intent (`check-only` or `apply`) and target paths."
+  display_name: "Project Roadmap Maintainer"
+  short_description: "Compatibility-only redirect for legacy roadmap-maintainer prompts."
+  default_prompt: "If a legacy prompt explicitly targets $project-roadmap-maintainer, redirect it to $project-docs-maintainer with mode=roadmap_maintenance and preserve the same target path and run intent."
