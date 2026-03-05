@@ -14,7 +14,7 @@ Maintain a focused set of reusable productivity skills with clear naming, determ
 
 - [x] Milestone 0: Naming and structural refactor (completed)
 - [x] Milestone 1: Docs skill consolidation and orchestrator addition (completed)
-- [ ] Milestone 2: Validation hardening and snippet adoption (in progress)
+- [x] Milestone 2: Validation hardening and maintainer-doc cleanup (completed)
 
 ## Milestone 0: Naming and structural refactor
 
@@ -62,16 +62,16 @@ Scope:
 
 Tickets:
 
-- [ ] Run stale-name sweeps and reference-integrity checks.
-- [ ] Validate each skill `agents/openai.yaml` against current SKILL intent.
-- [ ] Reduce maintainer docs to `AGENTS.md`, `docs/maintainers/reality-audit.md`, and `docs/maintainers/workflow-atlas.md`.
+- [x] Run stale-name sweeps and reference-integrity checks.
+- [x] Validate each skill `agents/openai.yaml` against current SKILL intent.
+- [x] Reduce maintainer docs to `AGENTS.md`, `docs/maintainers/reality-audit.md`, and `docs/maintainers/workflow-atlas.md`.
 - [x] Consolidate roadmap handling under `project-docs-maintainer` with `mode=roadmap_maintenance`.
 - [x] Keep `project-roadmap-maintainer` as a deprecation-cycle compatibility shim.
 
 Exit criteria:
 
-- [ ] No stale skill names remain outside migration docs.
-- [ ] Maintainer guidance is reduced to the durable operating set.
+- [x] No stale skill names remain outside explicit compatibility or migration notes.
+- [x] Maintainer guidance is reduced to the durable operating set.
 - [x] Canonical roadmap ownership is documented under `project-docs-maintainer`.
 
 ## Risks and mitigations

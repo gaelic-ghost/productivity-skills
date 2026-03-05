@@ -43,5 +43,7 @@ Applicability guidance:
 - Use the same names for the same concepts across `SKILL.md`, `agents/openai.yaml`, references, automation prompts, and scripts.
 - If config changes workflow decisions or output contracts, surface that in the main workflow instead of hiding it only in references.
 - When docs and scripts disagree on a workflow contract, fix the script or explicitly narrow the documented contract so they match.
+- When asked to report roadmap status, reconcile `ROADMAP.md` against completed repo work first or explicitly say the roadmap is stale before summarizing it.
+- After completing milestone work, update `ROADMAP.md` in the same change unless the user explicitly says not to.
 
 See `docs/maintainers/reality-audit.md` and `docs/maintainers/workflow-atlas.md` for the durable maintainer reference set.

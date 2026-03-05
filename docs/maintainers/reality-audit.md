@@ -22,6 +22,12 @@ If two layers disagree, fix the lower-trust layer or narrow its claims.
 - Skill runtime docs must not depend on `../docs/...`.
 - Repo-level maintainer docs may describe patterns and audits, but they are not part of installed skill operation.
 
+## Roadmap Accuracy Rule
+
+- Do not present `ROADMAP.md` as authoritative if you have evidence it is behind completed repo work.
+- When asked to report roadmap status, reconcile `ROADMAP.md` first or explicitly state that it is stale before summarizing it.
+- After finishing milestone work, update `ROADMAP.md` in the same change unless the user explicitly asks you not to.
+
 ## Current Repo Reality
 
 ### Skill Runtime Surfaces
@@ -144,3 +150,4 @@ Use these conventions when editing repo-maintainer guidance.
 - `things-digest-generator` uses deterministic `Input error:` failures for missing or invalid JSON fallback inputs.
 - `project-roadmap-maintainer` is compatibility-only and never owns roadmap behavior.
 - `project-docs-maintainer` is the canonical owner of `skills_readme_maintenance` and `roadmap_maintenance`.
+- Intentional compatibility mentions such as `project-roadmap-maintainer` and `skills_readme_alignment` are allowed and do not count as stale-name drift.
