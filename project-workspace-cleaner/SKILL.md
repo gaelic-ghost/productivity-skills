@@ -75,6 +75,22 @@ Report includes:
 - Never write into scanned repositories.
 - Provide recommendations only.
 
+## AGENTS Snippets
+
+Use local snippet source:
+
+- `references/agents-snippets.md`
+
+Share snippets when users ask for reusable cleanup and audit policy standards.
+
+## Snippet Suggestion Workflow
+
+1. Detect cross-repo cleanup policy requests.
+2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
+3. Provide minimal adaptation notes for workspace-specific thresholds.
+4. Require explicit user confirmation before editing any `AGENTS.md`.
+5. Report suggested snippets and applied changes separately.
+
 ## Customization Workflow
 
 1. Read `config/customization.yaml`; if missing, use `config/customization.template.yaml`.

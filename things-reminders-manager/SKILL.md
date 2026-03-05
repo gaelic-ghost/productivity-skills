@@ -41,6 +41,22 @@ Use an update-first workflow for Things reminder requests.
 - Never silently create duplicates when update intent is clear.
 - Never hide auth source/status details.
 
+## AGENTS Snippets
+
+Use local snippet source:
+
+- `references/agents-snippets.md`
+
+Share snippets when users request reusable standards for date handling, safety defaults, or MCP workflow policies.
+
+## Snippet Suggestion Workflow
+
+1. Detect requests for reusable reminder-management policy language.
+2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
+3. Provide minimal adaptation notes (timezone and confirmation expectations).
+4. Require explicit user confirmation before editing any `AGENTS.md`.
+5. Report what was suggested versus what was applied.
+
 ## Customization Workflow
 
 1. Read `config/customization.yaml`; if missing, read `config/customization.template.yaml`.

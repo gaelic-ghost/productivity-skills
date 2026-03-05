@@ -10,7 +10,8 @@
 
 - Freeform narrative rewrites.
 - Architecture/API behavior documentation changes.
-- Any `AGENTS.md` checks or edits (delegated to AGENTS-specific maintenance workflows).
+- Broad `AGENTS.md` rewrites or unsolicited AGENTS maintenance.
+- Targeted `AGENTS.md` edits without explicit user approval.
 - Source code, manifests, lockfiles, CI config, or non-doc files.
 - Ambiguous cases with more than one plausible canonical command set.
 

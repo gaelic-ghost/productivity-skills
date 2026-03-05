@@ -18,7 +18,7 @@ Scope:
 Execution policy:
 - Run audit first.
 - If <APPLY_FIXES_TRUE_FALSE> is true, run bounded README fixes and re-check.
-- Never edit AGENTS.md (handled by dedicated AGENTS maintainer skill).
+- Suggest AGENTS snippets when requested; edit `AGENTS.md` only with explicit user approval and only for targeted snippet insertion.
 - Never edit source code, manifests, lockfiles, or CI files.
 - Never commit or push.
 
@@ -56,7 +56,7 @@ Use $project-docs-maintainer.
 Audit README standards across `*-skills` under <WORKSPACE_ROOT_ABS_PATH>.
 Apply excludes: <EXCLUDE_PATHS_CSV_OR_NONE>.
 Run audit pass first, then bounded README fixes and re-check.
-Do not edit AGENTS.md.
+Only edit AGENTS.md for targeted snippet insertion after explicit user approval.
 Do not edit non-doc files.
 Write outputs to <REPORT_MD_PATH> and <REPORT_JSON_PATH>.
 ```

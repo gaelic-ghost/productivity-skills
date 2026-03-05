@@ -12,8 +12,9 @@ Use this skill as the front door for skill selection and composition.
 1. Classify user intent by domain.
 2. Select one primary skill and optional secondary skill.
 3. If the capability is missing in current environment, output exact install command(s).
-4. Do not auto-install skills.
-5. Ask user to confirm installation before proceeding.
+4. If user asks for reusable standards, suggest AGENTS snippets from local references.
+5. Do not auto-install skills.
+6. Ask user to confirm installation before proceeding.
 
 ## Routing Output Format
 
@@ -43,3 +44,19 @@ Never claim installation success until user confirms completion.
 - `things-digest-generator`
 
 Use `references/skill-routing-matrix.md` for domain-to-skill mapping and composition patterns.
+
+## AGENTS Snippets
+
+Use local snippet source:
+
+- `references/agents-snippets.md`
+
+Use this when routing reveals users need shared standards in addition to a task-specific skill.
+
+## Snippet Suggestion Workflow
+
+1. Detect requests for cross-repo standards or policy boilerplate.
+2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
+3. Point to insertion target in user `AGENTS.md` and suggest minimal edits.
+4. Require explicit user confirmation before editing any `AGENTS.md`.
+5. Report suggested snippets and applied edits in separate lines.

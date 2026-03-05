@@ -10,6 +10,21 @@
 | Things weekly planning digest, priorities, week-ahead summary | `things-digest-generator` | `things-reminders-manager` |
 | Workspace cleanup chores, stale artifacts, disk hygiene ranking | `project-workspace-cleaner` | `project-docs-maintainer` |
 
+## Snippet Routing Hints
+
+Use AGENTS snippet suggestions when intent includes:
+
+- "standardize this across repos"
+- "give me AGENTS policy snippets"
+- "create reusable guidance"
+- "copy/paste standards"
+Snippet sources:
+
+- Orchestrator: `references/agents-snippets.md`
+- Routed skill: `<selected-skill>/references/agents-snippets.md`
+
+Prefer routed skill snippets first, then orchestrator snippets for generic policy blocks.
+
 ## Install Guidance
 
 When a selected skill is unavailable, output:

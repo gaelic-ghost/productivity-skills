@@ -69,6 +69,22 @@ When user requests customization:
    - `profile: <selected-profile>`
 5. Validate with a dry-run roadmap update and report behavior deltas.
 
+## AGENTS Snippets
+
+Use local snippet source:
+
+- `references/agents-snippets.md`
+
+Share snippets when users want reusable roadmap governance standards across multiple repositories.
+
+## Snippet Suggestion Workflow
+
+1. Detect requests for repeatable roadmap policy language or standards.
+2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
+3. Indicate recommended insertion point in `AGENTS.md`.
+4. Require explicit user confirmation before any `AGENTS.md` edit.
+5. Report suggested snippets separately from applied edits.
+
 ## Automation Templates
 
 Use `$project-roadmap-maintainer` in automation prompts.

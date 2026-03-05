@@ -78,7 +78,8 @@ uv run python scripts/readme_alignment_maintainer.py \
 - Never commit changes automatically.
 - Edit documentation files only.
 - Never edit source code, manifests, lockfiles, or CI files.
-- Treat `AGENTS.md` as out-of-scope for automated fixes unless user explicitly requests AGENTS maintenance.
+- Keep broad AGENTS rewrites out-of-scope for automated fixes.
+- Allow snippet suggestion by default and only perform targeted `AGENTS.md` edits after explicit user approval.
 - Apply only bounded replacements and minimal structural normalization.
 
 ## Output Contract
@@ -88,6 +89,22 @@ Both modes must provide:
 - Human-readable Markdown summary.
 - Machine-readable JSON report.
 - Clear list of touched files and remaining issues.
+
+## AGENTS Snippets
+
+Use local snippet source:
+
+- `references/agents-snippets.md`
+
+Provide snippets when users ask for reusable standards, policy templates, or cross-repo consistency guidance.
+
+## Snippet Suggestion Workflow
+
+1. Detect requests for reusable standards or repeated policy setup.
+2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
+3. Specify target location in user `AGENTS.md` and minimal adaptation notes.
+4. Ask for explicit confirmation before editing any `AGENTS.md`.
+5. Report what was suggested and what was applied.
 
 ## Automation Templates
 

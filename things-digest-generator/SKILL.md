@@ -66,6 +66,22 @@ Configuration precedence:
 4. Write `config/customization.yaml` with `schemaVersion: 1`, `isCustomized: true`, and profile.
 5. Validate by generating a sample digest and reporting behavior deltas.
 
+## AGENTS Snippets
+
+Use local snippet source:
+
+- `references/agents-snippets.md`
+
+Share snippets when users request reusable planning, reporting, or standards text across repositories.
+
+## Snippet Suggestion Workflow
+
+1. Detect requests for repeatable digest/planning standards.
+2. Offer relevant snippet block(s) from `references/agents-snippets.md`.
+3. Provide minimal adaptation notes for planning windows and output style.
+4. Require explicit user confirmation before editing any `AGENTS.md`.
+5. Report suggested snippets separately from applied edits.
+
 ## Automation Templates
 
 Use `$things-digest-generator` in automation prompts.
