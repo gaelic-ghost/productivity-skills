@@ -1,6 +1,8 @@
-# Skill Workflow Atlas
+# Maintainer Workflow Atlas
 
-This document is the canonical workflow reference for every skill in this repository. It diagrams real current workflows, captures their inputs and outputs, and describes the public Agent+Skill UX without implying that grouped workflows should be split into separate skills.
+This document is maintainer-only. It is the repo-level workflow reference for every skill in this repository.
+
+It diagrams real current workflows, captures their inputs and outputs, and describes the public Agent+Skill UX so maintainers can verify that runtime docs still match code. It is not part of installed skill runtime context.
 
 ## Repo-Wide Conventions
 

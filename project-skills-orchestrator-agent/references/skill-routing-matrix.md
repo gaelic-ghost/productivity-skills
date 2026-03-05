@@ -24,19 +24,6 @@
 - Route to `project-roadmap-maintainer` only when the user explicitly targets the legacy roadmap-maintainer surface.
 - Treat `skills_readme_alignment` as a compatibility alias for `skills_readme_maintenance`, not as a primary route.
 
-## Snippet Routing Hints
-
-Use AGENTS snippet suggestions when intent includes:
-
-- "standardize this across repos"
-- "give me AGENTS policy snippets"
-- "create reusable guidance"
-- "copy/paste standards"
-
-Snippet source:
-
-- Shared: `../docs/agents-standards-snippets.md`
-
 ## Install Guidance
 
 When a selected skill is unavailable, output:

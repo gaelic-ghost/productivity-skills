@@ -89,4 +89,3 @@ Use one canonical skill entrypoint for documentation maintenance, then choose th
 - `references/fix-policies.md`
 - `references/roadmap-customization.md`
 - `references/roadmap-config-schema.md`
-- `../docs/agents-standards-snippets.md`

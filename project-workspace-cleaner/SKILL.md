@@ -62,4 +62,3 @@ Each finding includes:
 - `references/customization.md`
 - `references/automation-prompts.md`
 - `references/patterns.md`
-- `../docs/agents-standards-snippets.md`

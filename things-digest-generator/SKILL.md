@@ -66,4 +66,3 @@ Build a repeatable Things planning digest from Things MCP data or equivalent JSO
 - `references/config-schema.md`
 - `references/suggestion-rules.md`
 - `references/automation-prompts.md`
-- `../docs/agents-standards-snippets.md`

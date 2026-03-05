@@ -109,11 +109,9 @@ Then ask your Agent for help finding a skill for "" or ""
 ```text
 .
 ├── README.md
-├── LICENSE
 ├── AGENTS.md
-├── ROADMAP.md
 ├── docs/
-│   └── agents-standards-snippets.md
+│   └── maintainers/
 ├── project-docs-maintainer/
 ├── project-roadmap-maintainer/
 ├── project-skills-orchestrator-agent/
@@ -124,11 +122,9 @@ Then ask your Agent for help finding a skill for "" or ""
 
 ## Notes
 
-- Each skill keeps `SKILL.md` concise and pushes deeper details into `references/`.
-- `project-docs-maintainer` supports canonical `skills_readme_maintenance` and `roadmap_maintenance` modes.
-- Deprecated compatibility surfaces remain minimal and should not be used for new prompts.
-- Shared `AGENTS.md` snippet blocks live in `docs/agents-standards-snippets.md`.
-- Cross-skill workflow diagrams and Agent+Skill UX maps live in `docs/skill-workflow-atlas.md`.
+- Install and use skills individually; do not assume access to repo-level maintainer docs.
+- Prefer canonical skills over compatibility shims for new prompts.
+- Use `project-skills-orchestrator-agent` as the front door when you want routing help.
 
 ## Keywords
 

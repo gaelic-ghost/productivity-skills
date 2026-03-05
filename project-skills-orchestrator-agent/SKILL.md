@@ -57,4 +57,3 @@ npx skills add gaelic-ghost/productivity-skills --skill <skill-name>
 ## References
 
 - `references/skill-routing-matrix.md`
-- `../docs/agents-standards-snippets.md`

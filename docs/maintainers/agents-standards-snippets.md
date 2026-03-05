@@ -1,6 +1,8 @@
-# AGENTS Standards Snippets
+# Maintainer AGENTS Standards Snippets
 
-This file is the canonical shared source for reusable repository-level `AGENTS.md` snippets in this repo. Skill docs should reference this file directly instead of maintaining identical per-skill copies.
+This file is maintainer-only. It is the canonical shared source for reusable repository-level `AGENTS.md` snippets in this repo.
+
+Installed skills must not depend on this file.
 
 ## Python Execution Baseline
 

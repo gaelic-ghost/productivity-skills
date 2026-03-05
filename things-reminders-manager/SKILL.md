@@ -77,4 +77,3 @@ Use an update-first workflow for Things reminder requests.
 - `references/mcp-sequence.md`
 - `references/config-schema.md`
 - `references/automation-prompts.md`
-- `../docs/agents-standards-snippets.md`

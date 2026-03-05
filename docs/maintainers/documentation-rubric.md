@@ -1,6 +1,6 @@
-# Skill Documentation Rubric
+# Maintainer Documentation Rubric
 
-Use this rubric for both cleanup passes across this repository.
+This rubric is maintainer-only. Use it when auditing the repo so runtime docs stay accurate and self-contained.
 
 ## Pass 1: Accurate and Current
 
@@ -23,7 +23,7 @@ Refactor docs so the primary path is easy to follow without chasing branches.
 - Naming consistency: use the same term everywhere for the same thing.
 - Input contract clarity: state required inputs, optional overrides, defaults, and config precedence without ambiguity.
 - Output contract clarity: state exactly what the user gets back and when exact clean-run text such as `No findings.` is valid.
-- Reference modularity: shared material lives in one canonical source; skill-local references only hold skill-specific detail.
+- Reference modularity: skill runtime docs must stay inside the skill directory; repo-level docs are maintainer-only.
 - Deprecated-path handling: compatibility notes stay brief and never overshadow the canonical path.
 
 ## Reviewer Questions
