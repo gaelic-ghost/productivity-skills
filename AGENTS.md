@@ -68,6 +68,12 @@ The Markdown body has no required format, but if you want reliability, use a pre
 - `references/`: For longer documentation, checklists, internal templates, etc.
 - `assets/`: For static/output templates, diagrams, etc.
 
+### Python-backed Skills
+
+- A skill may include Python helpers under `scripts/` and Python tests under a skill-local `tests/` directory when deterministic validation or local tooling is useful.
+- In `*-skills` repositories that contain Python-backed skills, `pytest` and `PyYAML` should be readily available as the default maintainer/dev baseline.
+- Treat this as repository-maintainer tooling only, not as an installed-skill runtime requirement for end users.
+
 ### Constraints on Skills (Config/Customization/Automation)
 
 Skills are installed by an end user for their Agent to make use of. Skill installation is typically handled by the Vercel `skills` CLI, and located in a managed directory that neither Skill, nor Agent, will have write access to. Keep this in mind when considering customizations and configuration.
@@ -77,6 +83,7 @@ Some alternatives for user customization/config include using their Agent's memo
 ## Repo-local Passive Standards
 
 - Prefer `uv run` for Python command execution in examples and scripts.
+- Prefer a minimal root Python tool configuration when the repo contains Python-backed skills, so maintainers can run `uv run --group dev pytest ...` without ad hoc dependency flags.
 - Keep skill instructions deterministic, concise, and safety-forward.
 - Implement all applicable YAML fields in the Frontmatter.
 - Never auto-install skills; report required commands and wait for user confirmation.

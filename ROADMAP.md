@@ -17,6 +17,9 @@ Maintain a focused set of reusable productivity skills with clear naming, determ
 - [x] Milestone 2: Validation hardening and maintainer-doc cleanup (completed)
 - [x] Milestone 3: Standalone top-level skill recentering (completed)
 - [x] Milestone 4: Speech workflow expansion (completed)
+- [ ] Milestone 5: Speech summarization planning (planned)
+- [ ] Milestone 6: Default profile expansion planning (planned)
+- [ ] Milestone 7: Cross-agent speech compatibility planning (planned)
 
 ## Milestone 0: Naming and structural refactor
 
@@ -114,6 +117,65 @@ Exit criteria:
 - [x] `speak-with-profile` is listed alongside the other standalone skills in repo docs.
 - [x] The moved skill metadata and runtime docs describe a productivity-first speech workflow.
 - [x] Repo-level docs no longer imply that productivity workflows exclude speech-output tasks.
+
+## Milestone 5: Speech summarization planning
+
+Scope:
+
+- Plan the next speech feature set around summarize-then-speak workflows without changing the current public skill contract.
+- Define the intended planning surface for summarization modes, targeting, and safety constraints before implementation starts.
+
+Tickets:
+
+- [ ] Define the planning envelope for summarize-then-speak workflows in `speak-with-profile`.
+- [ ] Identify candidate summarize modes and their intended use cases for productivity listening.
+- [ ] Plan length-targeting and output-shaping behavior for audio summaries.
+- [ ] Plan safety constraints for summaries that must preserve entities, numbers, and ordered steps.
+- [ ] Define the validation and regression-test strategy for summarize-then-speak behavior.
+
+Exit criteria:
+
+- [ ] The roadmap describes summarize-then-speak as a concrete planned milestone with bounded tickets.
+- [ ] No implementation claims are made for summarization features that do not exist yet.
+
+## Milestone 6: Default profile expansion planning
+
+Scope:
+
+- Plan a broader starter profile set for common productivity listening tasks beyond the current baseline examples.
+- Keep accessibility-conscious defaults as part of the canonical speech workflow while expanding productivity-oriented options.
+
+Tickets:
+
+- [ ] Define the first additional default profiles to add beyond the current baseline.
+- [ ] Plan profile coverage for narrated notes, spoken drafts, audio summaries, and review-oriented listening.
+- [ ] Plan how new defaults should balance general productivity use with accessibility-friendly listening needs.
+- [ ] Define the documentation and example updates required when new default profiles are introduced.
+
+Exit criteria:
+
+- [ ] The roadmap names the next profile-expansion work as a planned milestone.
+- [ ] The milestone identifies a small curated default-profile expansion rather than an open-ended profile catalog.
+
+## Milestone 7: Cross-agent speech compatibility planning
+
+Scope:
+
+- Plan paths for `speak-with-profile` compatibility beyond Codex's built-in `$speech` workflow.
+- Explore multiple agent surfaces without promising implementation until target-specific constraints are understood.
+
+Tickets:
+
+- [ ] Evaluate Claude Code compatibility for speech-oriented workflows and delegation patterns.
+- [ ] Evaluate Claude Desktop compatibility for profile-aware speech workflows.
+- [ ] Evaluate OpenCode as an initial open-source coding-agent target.
+- [ ] Evaluate Aider as a backup open-source compatibility candidate.
+- [ ] Identify adapter and documentation constraints needed to support multiple agent speech capabilities without fragmenting the canonical skill.
+
+Exit criteria:
+
+- [ ] The roadmap explicitly names Claude Code, Claude Desktop, OpenCode, and Aider as initial planning targets.
+- [ ] The milestone remains planning-only and does not imply existing multi-agent support.
 
 ## Risks and mitigations
 
