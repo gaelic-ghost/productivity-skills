@@ -18,7 +18,6 @@ It diagrams real current workflows, captures their inputs and outputs, and descr
 | Skill | Canonical role | Workflows covered |
 | --- | --- | --- |
 | `project-docs-maintainer` | Canonical maintainer for `*-skills` README drift and checklist roadmap maintenance | `skills_readme_maintenance`, `roadmap_maintenance` |
-| `project-roadmap-maintainer` | Compatibility-only redirect | redirect workflow |
 | `project-workspace-cleaner` | Read-only cleanup audit | findings path, clean run, partial-results branch |
 | `things-digest-generator` | Things planning digest builder | MCP-first, JSON fallback, executive output, clean run, missing-input failure |
 | `things-reminders-manager` | Things reminder mutation workflow | create, update, `duplicatePolicy=ask-first`, `onUpdateWithoutToken` variants, blocked/disambiguation |
@@ -411,51 +410,6 @@ flowchart TD
   D --> E{"Apply error?"}
   E -- "yes" --> F["Return report with errors"]
   E -- "no" --> G["Normal workflow continues"]
-```
-
-## `project-roadmap-maintainer`
-
-### Workflow: compatibility redirect
-
-**Overview**
-
-- Triggered only when a prompt explicitly targets the legacy roadmap-maintainer surface.
-- Primary and only workflow.
-- `redirect-only`
-
-**Inputs**
-
-- A legacy roadmap request naming `$project-roadmap-maintainer`
-- Preserved values:
-  - project root
-  - roadmap path
-  - run intent (`check-only` or `apply`)
-
-**Branch Conditions**
-
-- No normal branching beyond preserving original parameters.
-
-**Outputs**
-
-- Redirect output naming:
-  - canonical skill: `$project-docs-maintainer`
-  - canonical mode: `roadmap_maintenance`
-  - preserved target path
-  - preserved run intent
-
-**Public Interface / UX**
-
-- The Agent should explain that this is a compatibility-only surface.
-- The user sees a redirect, not an independent roadmap workflow execution.
-
-**Diagram**
-
-```mermaid
-flowchart TD
-  A["Legacy prompt targets project-roadmap-maintainer"] --> B["Acknowledge compatibility-only surface"]
-  B --> C["Map to project-docs-maintainer + mode=roadmap_maintenance"]
-  C --> D["Preserve path and run intent"]
-  D --> E["Return redirect"]
 ```
 
 ## `project-workspace-cleaner`

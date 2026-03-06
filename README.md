@@ -32,11 +32,6 @@ This repository packages reusable Codex skills for canonical docs maintenance, r
 - `things-digest-generator`
   - Weekly Things digest generator with prioritized next-step suggestions.
 
-Compatibility only:
-
-- `project-roadmap-maintainer`
-  - Thin redirect shim for legacy roadmap-maintainer prompts. Prefer `project-docs-maintainer` for all new work.
-
 ## Quick Start (Vercel Skills CLI)
 
 Use the Vercel `skills` CLI to install from this repository.
@@ -60,10 +55,6 @@ npx skills add gaelic-ghost/productivity-skills --skill project-workspace-cleane
 npx skills add gaelic-ghost/productivity-skills --skill things-reminders-manager
 npx skills add gaelic-ghost/productivity-skills --skill things-digest-generator
 ```
-
-Compatibility note:
-
-- Install `project-roadmap-maintainer` only when you must preserve a legacy prompt or install surface.
 
 ## Update Skills
 
@@ -104,7 +95,6 @@ Then ask your Agent for help finding a skill for "" or ""
 ├── docs/
 │   └── maintainers/
 ├── project-docs-maintainer/
-├── project-roadmap-maintainer/
 ├── project-workspace-cleaner/
 ├── things-digest-generator/
 └── things-reminders-manager/

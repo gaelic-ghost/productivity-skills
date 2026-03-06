@@ -36,10 +36,6 @@ If two layers disagree, fix the lower-trust layer or narrow its claims.
   - Scripts: `scripts/skills_readme_maintenance.py`, `scripts/roadmap_alignment_maintainer.py`
   - Metadata: `agents/openai.yaml`
   - Runtime docs: `SKILL.md`, `references/*`
-- `project-roadmap-maintainer`
-  - Redirect-only compatibility surface
-  - Metadata: `agents/openai.yaml`
-  - Runtime docs: `SKILL.md`, `references/*`
 - `project-workspace-cleaner`
   - Script: `scripts/scan_workspace_cleanup.py`
   - Metadata: `agents/openai.yaml`
@@ -146,6 +142,5 @@ Use these conventions when editing repo-maintainer guidance.
 
 - `project-workspace-cleaner` reserves exact `No findings.` for complete clean runs with no skipped paths.
 - `things-digest-generator` uses deterministic `Input error:` failures for missing or invalid JSON fallback inputs.
-- `project-roadmap-maintainer` is compatibility-only and never owns roadmap behavior.
 - `project-docs-maintainer` is the canonical owner of `skills_readme_maintenance` and `roadmap_maintenance`.
-- Intentional compatibility mentions such as `project-roadmap-maintainer` and `skills_readme_alignment` are allowed and do not count as stale-name drift.
+- Intentional compatibility mentions such as `skills_readme_alignment` are allowed and do not count as stale-name drift.

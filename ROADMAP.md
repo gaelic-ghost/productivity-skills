@@ -26,7 +26,7 @@ Scope:
 
 Tickets:
 
-- [x] Rename roadmap skill to `project-roadmap-maintainer`.
+- [x] Establish roadmap maintenance under a domain-grouped skill surface.
 - [x] Rename workspace cleanup skill to `project-workspace-cleaner`.
 - [x] Rename Things reminder skill to `things-reminders-manager`.
 - [x] Rename Things digest skill to `things-digest-generator`.
@@ -67,7 +67,7 @@ Tickets:
 - [x] Validate each skill `agents/openai.yaml` against current SKILL intent.
 - [x] Reduce maintainer docs to `AGENTS.md`, `docs/maintainers/reality-audit.md`, and `docs/maintainers/workflow-atlas.md`.
 - [x] Consolidate roadmap handling under `project-docs-maintainer` with `mode=roadmap_maintenance`.
-- [x] Keep `project-roadmap-maintainer` as a deprecation-cycle compatibility shim.
+- [x] Keep roadmap guidance centered on the canonical docs-maintainer surface.
 
 Exit criteria:
 
@@ -92,11 +92,12 @@ Exit criteria:
 
 - [x] Active repo docs present only standalone skill entrypoints.
 - [x] Maintainer docs describe the current post-router skill inventory.
+- [x] Roadmap maintenance is presented only through the canonical docs-maintainer entrypoint.
 
 ## Risks and mitigations
 
 - Risk: Users still invoke deprecated names.
-  Mitigation: keep migration table in README and clear install examples.
+  Mitigation: keep canonical usage guidance explicit in repo docs and skill prompts.
 - Risk: Consolidated docs skill loses specificity.
   Mitigation: enforce explicit mode selection in `project-docs-maintainer`.
 
